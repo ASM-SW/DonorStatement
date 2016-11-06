@@ -1,0 +1,79 @@
+
+
+
+Steps
+1) Configuration
+	Input file name
+	template file name
+	Output Directory
+
+2) Parse input file
+	List of Items, select which ones to include
+
+3) Create Docs
+	create pdf for each user - background thread
+	create list of docs
+
+4) Email
+	process list of docs
+	send email with attachment to each user with an email
+	generate report of those that were not sent.
+
+
+
+
+Configuration file
+- List of Bookmarks and columns to fill it in with
+
+
+- Logging
+   http://stackoverflow.com/questions/2196097/elegant-log-window-in-winforms-c-sharp
+   http://stackoverflow.com/questions/383813/best-approach-to-windows-forms-rolling-log-output-in-textbox
+
+   Making Thread-Safe Calls by using BackgroundWorker
+   https://msdn.microsoft.com/en-us/library/ms171728(v=vs.110).aspx#Anchor_1
+   https://msdn.microsoft.com/en-us/library/system.windows.forms.control.invokerequired(v=vs.110).aspx
+
+
+- Remember last used:  input, template output directory
+
+
+- Ask user for input file
+- Ask user for template file
+- Ask User for output directory
+  If directory exists, ask permission to empty it
+Read file into datatable
+   C:\Users\asmey\documents\visual studio 2015\Projects\FindMissingRows\FindMissingRows\Form1.cs
+       FillDataTableFromCSVFile(..)
+
+- Ask user which items to include in report
+   Need to generate list of items in csv file.
+   DataView.ToTable Method (Boolean, String[])
+   https://msdn.microsoft.com/en-us/library/wec2b2e6(v=vs.110).aspx
+   DataTable ToTable(bool distinct, params string[] columnNames)
+   
+   http://stackoverflow.com/questions/17466253/select-distinct-values-from-a-large-datatable-column
+   DataView view = new DataView(table);
+   DataTable distinctValues = view.ToTable(true, "Item")
+
+- Create output files
+   Get List of unique Names
+   foreach name in uniqueNames
+		filter datatable by name column
+		sort by date
+		   public DataRow[] DataTable.Select(string filterExpression, string sort)
+		   https://msdn.microsoft.com/en-us/library/way3dy9w(v=vs.110).aspx
+		Create output file
+
+   
+
+- Send email
+  List those that did not have email
+  
+             send email
+             http://ask.brothersoft.com/how-to-put-a-word-document-on-the-body-of-an-email-in-c-186769.html
+        http://stackoverflow.com/questions/17241336/sending-a-word-document-as-an-email
+        http://stackoverflow.com/questions/22083214/how-to-send-an-email-with-attachment-in-c-sharp
+
+
+

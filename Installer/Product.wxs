@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='Windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Product Name='Donor Statement' Id='13A55141-A928-40D9-9A71-097F96267669' UpgradeCode='D9098DC4-6016-423F-8B77-D48F74C1A443'
+    Language='1033' Codepage='1252' Version='1.0.0' Manufacturer='ASM'>
+
+    <Package Id='*' Keywords='Installer' Description="Donor Statement" Manufacturer='ASM'
+      InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+
+    <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' />
+
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder' Name='PFiles'>
+        <Directory Id='ASM' Name='ASM'>
+          <Directory Id='INSTALLDIR' Name='DonorStatement'>
+
+            <Component Id='MainExecutable' Guid='338AA8A1-F04A-4492-8965-A100AB1E33F1'>
+              <File Id='DonorStatementEXE' Name='DonorStatement.exe' DiskId='1' Source="$(var.DonorStatement.TargetPath)"  KeyPath='yes'>
+                <Shortcut Id="startmenuDonorStatement" Directory="ProgramMenuDir" Name="DonorStatement" WorkingDirectory='INSTALLDIR' Icon="DonorStatement.exe" IconIndex="0"  Advertise="yes" />
+                <Shortcut Id="desktopDonorStatement" Directory="DesktopFolder" Name="DonorStatement" WorkingDirectory='INSTALLDIR' Icon="DonorStatement.exe" IconIndex="0" Advertise="yes" />
+              </File>
+            </Component>
+
+            <!--
+            <Component Id='HelperLibrary' Guid='168A2FF1-A7AC-4377-A7B4-928E128E4890'>
+              <File Id='HelperDLL' Name='Helper.dll' DiskId='1' Source='Helper.dll' KeyPath='yes' />
+            </Component>
+            <Component Id='Manual' Guid='3399D939-9AD9-4273-BA44-3CD7F17BBE7E'>
+              <File Id='Manual' Name='Manual.pdf' DiskId='1' Source='Manual.pdf' KeyPath='yes'>
+                <Shortcut Id="startmenuManual" Directory="ProgramMenuDir" Name="Instruction Manual" Advertise="yes" />
+              </File>
+            </Component>
+            -->
+
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="DonorStatement">
+          <Component Id="ProgramMenuDir" Guid="86E34CF4-81A8-493C-B47A-1035BD2D0309">
+            <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+            <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+
+    <Feature Id='Complete' Level='1'>
+      <ComponentRef Id='MainExecutable' />
+      <!--
+      <ComponentRef Id='HelperLibrary' />
+      <ComponentRef Id='Manual' />
+      -->
+      <ComponentRef Id='ProgramMenuDir' />
+    </Feature>
+    <Icon Id="DonorStatement.exe" SourceFile="$(var.DonorStatement.TargetPath)" />
+  </Product>
+</Wix>
