@@ -206,5 +206,11 @@ namespace DonorStatement
             SwitchPanelForm(PanelNavDirection.backward);
 
         }
+
+        private void buttonAbout_Click(object sender, EventArgs e)
+        {
+            AboutBox1 aboutBox = new AboutBox1(this);
+            aboutBox.ShowDialog();
+        }
     } // Form1
 }
