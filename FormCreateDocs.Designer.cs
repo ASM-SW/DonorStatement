@@ -91,7 +91,7 @@ namespace DonorStatement
             // 
             // FormCreateDocs
             // 
-            this.AccessibleDescription = "Click on Start to create documents";
+            this.AccessibleDescription = "Click on Start to create documents"; 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(493, 231);

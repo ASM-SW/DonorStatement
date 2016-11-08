@@ -79,6 +79,7 @@ namespace DonorStatement
                 worker.ReportProgress(percentComplete);
             }
             m_docCreator.CreateDocsDone();
+            m_docCreator.SaveFileList();
         }
 
 

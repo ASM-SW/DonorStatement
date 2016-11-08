@@ -17,7 +17,7 @@ namespace DonorStatement
         private object m_oMissing = System.Reflection.Missing.Value;
         //private object oEndOfDoc = @"\endofdoc"; /* \endofdoc is a predefined bookmark */
         private LogMessageDelegate m_logger;
-        private List<string> m_Files = new List<string>();
+        private List<KeyValuePair<string, string>> m_Files = new List<KeyValuePair<string, string>>();
 
         // List of colun names used for report.  This must be manually maintained.
         // used to check if DataTable has the correct columns
@@ -246,10 +246,7 @@ namespace DonorStatement
             string amount = string.Format("{0:C2}", total);
             bookMarks.Add(new KeyValuePair<string, string>("Total", amount));
 
-            CreateDocument(bookMarks, donations, "TablePayments", fileName, oDoc);
-
-
-
+            CreateDocument(bookMarks, donations, "TablePayments", fileName, oDoc, customerName);
             m_word.Visible = false;
         }
 
@@ -265,7 +262,7 @@ namespace DonorStatement
         /// <param name="oDoc">The document</param>
         /// <returns>false on any error</returns>
         private bool CreateDocument(List<KeyValuePair<string, string>> bookMarks, List<List<string>> donations, string tableName, string fileName,
-            Word.Document oDoc)
+            Word.Document oDoc, string customerName)
         {
             string fullFileName = Path.Combine(FormMain.Config.OutputDirectory, fileName);
             m_logger("Creating: " + fullFileName);
@@ -279,7 +276,7 @@ namespace DonorStatement
             {
                 result = false;
             }
-            m_Files.Add(fullFileName);
+            m_Files.Add(new KeyValuePair<string, string>(customerName, fullFileName));
 
             SavePdf(oDoc, fullFileName);
             oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
@@ -367,32 +364,36 @@ namespace DonorStatement
             }
         }
 
-        public void Close()
+        public void SaveFileList()
         {
-            try
-            {
-                m_word.Quit();
-            }
-            catch (Exception)
-            { }
-
-
             string fileName = Path.Combine(FormMain.Config.OutputDirectory, "1FileList.csv");
             try
             {
                 using (StreamWriter file = new StreamWriter(fileName))
                 {
-                    file.WriteLine("FileName");
-                    foreach (string item in m_Files)
-                    {
-                        file.WriteLine(item);
-                    }
+                    file.WriteLine("CustomerName,FileName");
+                    foreach (var item in m_Files)
+                        file.WriteLine(string.Format("\"{0}\",\"{1}\"", item.Key, item.Value));
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving file: " + fileName + "\n" + ex);
+                MessageBox.Show("Error saving file: " + fileName + "\n" + ex.Message);
             }
+        }
+
+        public void Close()
+        {
+            try
+            {
+                if (m_word != null)
+                    m_word.Quit();
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.ToString());
+            }
+
         } // close
 
     }
