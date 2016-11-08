@@ -3,14 +3,14 @@
   <Product Name='Donor Statement' Id='13A55141-A928-40D9-9A71-097F96267669' UpgradeCode='D9098DC4-6016-423F-8B77-D48F74C1A443'
     Language='1033' Codepage='1252' Version='1.0.0' Manufacturer='ASM'>
 
-    <Package Id='*' Keywords='Installer' Description="Donor Statement" Manufacturer='ASM'
+    <Package Id='*' Keywords='Installer' Description="Donor Statement" Manufacturer='ASM-SW'
       InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
 
     <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' />
-
+    <Property Id="DISABLEADVTSHORTCUTS" Value="1" />  <!-- This allows windows isntaller to use regular shortcuts for the PDF and DOTX files-->
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
-        <Directory Id='ASM' Name='ASM'>
+        <Directory Id='ASM' Name='ASM-SW'>
           <Directory Id='INSTALLDIR' Name='DonorStatement'>
 
             <Component Id='MainExecutable' Guid='338AA8A1-F04A-4492-8965-A100AB1E33F1'>
@@ -20,16 +20,17 @@
               </File>
             </Component>
 
-            <!--
-            <Component Id='HelperLibrary' Guid='168A2FF1-A7AC-4377-A7B4-928E128E4890'>
-              <File Id='HelperDLL' Name='Helper.dll' DiskId='1' Source='Helper.dll' KeyPath='yes' />
-            </Component>
             <Component Id='Manual' Guid='3399D939-9AD9-4273-BA44-3CD7F17BBE7E'>
-              <File Id='Manual' Name='Manual.pdf' DiskId='1' Source='Manual.pdf' KeyPath='yes'>
-                <Shortcut Id="startmenuManual" Directory="ProgramMenuDir" Name="Instruction Manual" Advertise="yes" />
+              <File Id='Manual' Name='DonorStatement.pdf' DiskId='1' Source="$(var.DonorStatement.ProjectDir)\DonorStatement.pdf" KeyPath='yes'>
+                <Shortcut Id="startmenuManual" Directory="ProgramMenuDir" WorkingDirectory='INSTALLDIR' Name="DonorStatement Help" Advertise="yes" />
               </File>
             </Component>
-            -->
+
+            <Component Id='WordDotx' Guid='324F7068-2DB7-442B-A998-B5371E805FE5'>
+              <File Id='WordDotx' Name='YearEndDonnationStatement.dotx' DiskId='1' Source="$(var.DonorStatement.ProjectDir)\YearEndDonnationStatement.dotx" KeyPath='yes'>
+                <Shortcut Id="startmenuWordDotx" Directory="ProgramMenuDir" WorkingDirectory='INSTALLDIR' Name="Year End Example Word Template" Advertise="yes"/>
+              </File>
+            </Component>           
 
           </Directory>
         </Directory>
@@ -49,11 +50,9 @@
 
     <Feature Id='Complete' Level='1'>
       <ComponentRef Id='MainExecutable' />
-      <!--
-      <ComponentRef Id='HelperLibrary' />
       <ComponentRef Id='Manual' />
-      -->
       <ComponentRef Id='ProgramMenuDir' />
+      <ComponentRef Id='WordDotx'/>
     </Feature>
     <Icon Id="DonorStatement.exe" SourceFile="$(var.DonorStatement.TargetPath)" />
   </Product>

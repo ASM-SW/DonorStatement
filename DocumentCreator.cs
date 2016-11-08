@@ -23,24 +23,27 @@ namespace DonorStatement
         // used to check if DataTable has the correct columns
         private List<string> m_requiredColumnNames = new List<string>
         {
-            "Name Contact"
-            , "Name"
-            , "Item"
-            , "Name Street1"
-            , "Name Street2"
-            , "Name City"
-            , "Name State"
-            , "Name Zip"
+            "Date",
+            "Memo",
+            "Name Contact",
+            "Name",
+            "Item",
+            "Name Street1",
+            "Name Street2",
+            "Name City",
+            "Name State",
+            "Name Zip",
+            "Paid Amount"
         };
 
         private List<string> m_requiredBookmarkNames = new List<string>
         {
-            "Name"
-            , "StatementDate"
-            , "ToAddress"
-            , "YearDateRange"
-            , "Total"
-            , "TablePayments"
+            "Name",
+            "StatementDate",
+            "ToAddress",
+            "YearDateRange",
+            "Total",
+            "TablePayments"
         };
 
         private DocumentCreator() { }

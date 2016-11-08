@@ -50,6 +50,7 @@ namespace DonorStatement
             // 
             // lbLogging
             // 
+            this.lbLogging.BackColor = System.Drawing.Color.GhostWhite;
             this.lbLogging.ContextMenuStrip = this.contextMenuStrip1;
             this.lbLogging.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.lbLogging.FormattingEnabled = true;
