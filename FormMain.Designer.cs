@@ -49,6 +49,7 @@ namespace DonorStatement
             this.labelStep = new System.Windows.Forms.Label();
             this.buttonAbout = new System.Windows.Forms.Button();
             this.buttonHelp = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -144,7 +145,7 @@ namespace DonorStatement
             // 
             // buttonAbout
             // 
-            this.buttonAbout.Location = new System.Drawing.Point(501, 16);
+            this.buttonAbout.Location = new System.Drawing.Point(501, 17);
             this.buttonAbout.Name = "buttonAbout";
             this.buttonAbout.Size = new System.Drawing.Size(75, 23);
             this.buttonAbout.TabIndex = 10;
@@ -162,11 +163,22 @@ namespace DonorStatement
             this.buttonHelp.UseVisualStyleBackColor = true;
             this.buttonHelp.Click += new System.EventHandler(this.buttonHelp_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            this.label1.Location = new System.Drawing.Point(9, 84);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(64, 13);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "labelVersion";
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(597, 539);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonHelp);
             this.Controls.Add(this.buttonAbout);
             this.Controls.Add(this.labelStep);
@@ -181,6 +193,7 @@ namespace DonorStatement
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -198,6 +211,7 @@ namespace DonorStatement
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
         private System.Windows.Forms.Button buttonAbout;
         private System.Windows.Forms.Button buttonHelp;
+        private System.Windows.Forms.Label label1;
     }
 }
 

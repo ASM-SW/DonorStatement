@@ -58,6 +58,9 @@ namespace DonorStatement
             m_forms[0].Show();
             butBack.Enabled = false;
 
+            label1.Text = "Version: " +Application.ProductVersion;
+            LogMessage(label1.Text);
+
             // load first form
             SwitchPanelForm(PanelNavDirection.forward);
         }
