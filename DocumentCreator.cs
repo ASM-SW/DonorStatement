@@ -10,6 +10,21 @@ using Word = Microsoft.Office.Interop.Word;
 
 namespace DonorStatement
 {
+    public class DonorRecord
+    {
+        private DonorRecord() { }
+
+        public DonorRecord(string name, string fileName, string email)
+        {
+            Name = name;
+            FileName = fileName;
+            Email = email;
+        }
+
+        public string Name { get; set; }
+        public string FileName { get; set; }
+        public string Email { get; set; }
+    }
     // this class handles creating, updating and saving the document
     public class DocumentCreator
     {
@@ -17,7 +32,7 @@ namespace DonorStatement
         private object m_oMissing = System.Reflection.Missing.Value;
         //private object oEndOfDoc = @"\endofdoc"; /* \endofdoc is a predefined bookmark */
         private LogMessageDelegate m_logger;
-        private List<KeyValuePair<string, string>> m_Files = new List<KeyValuePair<string, string>>();
+        private List<DonorRecord> m_Files = new List<DonorRecord>();
 
         // List of colun names used for report.  This must be manually maintained.
         // used to check if DataTable has the correct columns
@@ -28,6 +43,7 @@ namespace DonorStatement
             "Name Contact",
             "Name",
             "Item",
+            "Name E-Mail",
             "Name Street1",
             "Name Street2",
             "Name City",
@@ -231,13 +247,14 @@ namespace DonorStatement
             }
 
             string fileName = customerName = table.Rows[0]["Name"].ToString();
+            string email = table.Rows[0]["Name E-Mail"].ToString();
             fileName = fileName.Replace(',', '.');
             fileName = fileName.Replace('&', '-');
             fileName = fileName.Replace('\'', '_');
             fileName = fileName.Replace(" ", string.Empty);
             if (total == 0)
             {
-                m_logger("Skipping: " + fileName + ", No items were found.");
+                m_logger("Skipping: " + customerName + ", No items were found, or the item amount was $0.");
                 oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
                 return;
             }
@@ -246,7 +263,7 @@ namespace DonorStatement
             string amount = string.Format("{0:C2}", total);
             bookMarks.Add(new KeyValuePair<string, string>("Total", amount));
 
-            CreateDocument(bookMarks, donations, "TablePayments", fileName, oDoc, customerName);
+            CreateDocument(bookMarks, donations, "TablePayments", fileName, oDoc, customerName, email);
             m_word.Visible = false;
         }
 
@@ -262,7 +279,7 @@ namespace DonorStatement
         /// <param name="oDoc">The document</param>
         /// <returns>false on any error</returns>
         private bool CreateDocument(List<KeyValuePair<string, string>> bookMarks, List<List<string>> donations, string tableName, string fileName,
-            Word.Document oDoc, string customerName)
+            Word.Document oDoc, string customerName, string email)
         {
             string fullFileName = Path.Combine(FormMain.Config.OutputDirectory, fileName);
             m_logger("Creating: " + fullFileName);
@@ -276,7 +293,7 @@ namespace DonorStatement
             {
                 result = false;
             }
-            m_Files.Add(new KeyValuePair<string, string>(customerName, fullFileName));
+            m_Files.Add(new DonorRecord(customerName, fullFileName, email));
 
             SavePdf(oDoc, fullFileName);
             oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
@@ -371,9 +388,9 @@ namespace DonorStatement
             {
                 using (StreamWriter file = new StreamWriter(fileName))
                 {
-                    file.WriteLine("CustomerName,FileName");
+                    file.WriteLine("CustomerName,FileName, Email");
                     foreach (var item in m_Files)
-                        file.WriteLine(string.Format("\"{0}\",\"{1}\"", item.Key, item.Value));
+                        file.WriteLine(string.Format("\"{0}\",\"{1}\",\"{2}\"", item.Name, item.FileName, item.Email));
                 }
             }
             catch (Exception ex)
