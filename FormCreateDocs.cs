@@ -16,6 +16,7 @@ namespace DonorStatement
         DocumentCreator m_docCreator;
         LogMessageDelegate m_logger;
         string m_strProgress = string.Empty;
+        object m_strProgressLock = new object();
 
         public FormCreateDocs(ref FileParser parser, ref DocumentCreator docCreator, ref LogMessageDelegate logger)
         {
@@ -72,7 +73,7 @@ namespace DonorStatement
                 m_docCreator.CreateDoc(table);
 
                 int percentComplete = (int)((float)(i + 1) / (float)names.Count * 100.0);
-                lock (m_strProgress)
+                lock (m_strProgressLock)
                 {
                     m_strProgress = string.Format("{0} of {1} completed", i + 1, names.Count);
                 }
@@ -86,7 +87,10 @@ namespace DonorStatement
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressBar1.Value = e.ProgressPercentage;
-            labelProgress.Text = m_strProgress;
+            lock (m_strProgressLock)
+            {
+                labelProgress.Text = m_strProgress; 
+            }
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

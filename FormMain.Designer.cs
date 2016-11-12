@@ -21,6 +21,9 @@ namespace DonorStatement
             {
                 components.Dispose();
             }
+            if (disposing)
+                m_parser.Dispose();
+
             base.Dispose(disposing);
         }
 

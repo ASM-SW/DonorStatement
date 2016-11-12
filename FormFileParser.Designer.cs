@@ -31,7 +31,7 @@ namespace DonorStatement
         private void InitializeComponent()
         {
             this.butParse = new System.Windows.Forms.Button();
-            this.checkedListItems = new System.Windows.Forms.CheckedListBox();
+            this.listItems = new System.Windows.Forms.ListBox();
             this.textFileHasBeenRead = new System.Windows.Forms.TextBox();
             this.buttonSelectAll = new System.Windows.Forms.Button();
             this.buttonClearSelections = new System.Windows.Forms.Button();
@@ -50,12 +50,13 @@ namespace DonorStatement
             // 
             // checkedListItems
             // 
-            this.checkedListItems.FormattingEnabled = true;
-            this.checkedListItems.Location = new System.Drawing.Point(35, 41);
-            this.checkedListItems.Margin = new System.Windows.Forms.Padding(2);
-            this.checkedListItems.Name = "checkedListItems";
-            this.checkedListItems.Size = new System.Drawing.Size(425, 199);
-            this.checkedListItems.TabIndex = 1;
+            this.listItems.FormattingEnabled = true;
+            this.listItems.Location = new System.Drawing.Point(35, 41);
+            this.listItems.Margin = new System.Windows.Forms.Padding(2);
+            this.listItems.Name = "listItems";
+            this.listItems.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.listItems.Size = new System.Drawing.Size(425, 199);
+            this.listItems.TabIndex = 1;
             // 
             // textFileHasBeenRead
             // 
@@ -90,7 +91,7 @@ namespace DonorStatement
             this.buttonClearSelections.UseVisualStyleBackColor = true;
             this.buttonClearSelections.Click += new System.EventHandler(this.buttonClearSelections_Click);
             // 
-            // FileParserForm
+            // FormFileParser
             // 
             this.AccessibleDescription = "Select Items to include in letters.";
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -99,11 +100,11 @@ namespace DonorStatement
             this.Controls.Add(this.buttonClearSelections);
             this.Controls.Add(this.buttonSelectAll);
             this.Controls.Add(this.textFileHasBeenRead);
-            this.Controls.Add(this.checkedListItems);
+            this.Controls.Add(this.listItems);
             this.Controls.Add(this.butParse);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "FileParserForm";
+            this.Name = "FormFileParser";
             this.Text = "FileParserForm";
             this.VisibleChanged += new System.EventHandler(this.FileParserForm_VisibleChanged);
             this.ResumeLayout(false);
@@ -114,7 +115,7 @@ namespace DonorStatement
         #endregion
 
         private System.Windows.Forms.Button butParse;
-        private System.Windows.Forms.CheckedListBox checkedListItems;
+        private System.Windows.Forms.ListBox listItems;
         private System.Windows.Forms.TextBox textFileHasBeenRead;
         private System.Windows.Forms.Button buttonSelectAll;
         private System.Windows.Forms.Button buttonClearSelections;

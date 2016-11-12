@@ -406,7 +406,7 @@ namespace DonorStatement
                 if (m_word != null)
                     m_word.Quit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //MessageBox.Show(ex.ToString());
             }

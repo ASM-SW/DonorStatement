@@ -20,8 +20,12 @@ namespace DonorStatement
             m_parser = parser;
             InitializeComponent();
 
+            // for each item coming in from file parser, load it into the control and select it.
             foreach (string item in FormMain.Config.ItemListSelected)
-                checkedListItems.Items.Add(item, true);
+                listItems.Items.Add(item);
+            for (int i = 0; i < listItems.Items.Count; i++)
+                listItems.SetSelected(i, true);
+
             SetTextFileHasBeenRead();
         }
 
@@ -41,23 +45,25 @@ namespace DonorStatement
 
             // replace item list in configuration with new one.
             // also populate control
-            checkedListItems.Items.Clear();
+            listItems.Items.Clear();
             List<string> newItemList = new List<string>();
             foreach (string item in itemListFromFile)
             {
                 // if item was in old list put in new list with same selection value.
                 if (FormMain.Config.ItemListSelected.BinarySearch(item) >= 0)
-                    checkedListItems.Items.Add(item, true);
+                {
+                    listItems.Items.Add(item);
+                    listItems.SelectedItems.Add(item);
+                }
                 else
-                    checkedListItems.Items.Add(item, false);
+                    listItems.Items.Add(item);
                 newItemList.Add(item);
             }
-            FillItemListSelected();
+            UpdateConfigurationWithSelectedItems();
 
             // scroll to top
-            if (checkedListItems.Items.Count > 0)
-                checkedListItems.TopIndex = 0;
-            checkedListItems.SelectedItems.Clear();
+            if (listItems.Items.Count > 0)
+                listItems.TopIndex = 0;
             SetTextFileHasBeenRead();
         }
 
@@ -65,24 +71,31 @@ namespace DonorStatement
         private void FileParserForm_VisibleChanged(object sender, EventArgs e)
         {
             if (((System.Windows.Forms.Control)sender).Visible)
-                return;
+                return;  // became visible, do nothing
 
-            FillItemListSelected();
+            UpdateConfigurationWithSelectedItems();
         }
 
-        private void FillItemListSelected()
+        private void UpdateConfigurationWithSelectedItems()
         {
             FormMain.Config.ItemListSelected.Clear();
-            foreach (string item in checkedListItems.CheckedItems)
+            foreach (string item in listItems.SelectedItems)
                 FormMain.Config.ItemListSelected.Add(item);
 
             FormMain.Config.ItemListSelected.Sort();
         }
 
-        private void CheckUnCheckAll(bool bChecked)
+        private void CheckUnCheckAll(bool bSelect)
         {
-            for (int i = 0; i < checkedListItems.Items.Count; ++i)
-                checkedListItems.SetItemChecked(i, bChecked);
+            listItems.Visible = false;
+            if (bSelect)
+            {
+                for (int i = 0; i < listItems.Items.Count; i++)
+                    listItems.SetSelected(i, true);
+            }
+            else
+                listItems.SelectedItems.Clear();
+            listItems.Visible = true;
         }
 
         private void buttonSelectAll_Click(object sender, EventArgs e)
@@ -94,5 +107,7 @@ namespace DonorStatement
         {
             CheckUnCheckAll(false);
         }
+
+    
     }
 }

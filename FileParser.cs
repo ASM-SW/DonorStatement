@@ -12,13 +12,13 @@ using System.Data;
 
 namespace DonorStatement
 {
-    public class FileParser
+    public class FileParser: IDisposable
     {
         LogMessageDelegate m_logger;
         DataTable m_dataTable = new DataTable();
         public bool FileHasBeenRead { get; set; }
         private FileParser() { }
-
+        bool m_disposed = false;
 
         public FileParser(LogMessageDelegate logger)
         {
@@ -120,6 +120,25 @@ namespace DonorStatement
             columNames = new List<string>();
             foreach (DataColumn col in m_dataTable.Columns)
                 columNames.Add(col.ColumnName);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (m_disposed)
+                return;
+
+            if (disposing)
+            {
+                m_dataTable.Dispose();
+            }
+            
+            m_disposed = true;
         }
     } // end class FileParser
 }

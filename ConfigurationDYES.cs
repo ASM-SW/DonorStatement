@@ -50,7 +50,6 @@ namespace DonorStatement
                 {
                     XmlSerializer ser = new XmlSerializer(typeof(ConfigurationDYES));
                     ser.Serialize(writer, this);
-                    writer.Close();
                 }
             }
             catch (Exception ex)
