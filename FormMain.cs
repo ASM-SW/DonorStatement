@@ -2,6 +2,7 @@
 //asmeyers@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
@@ -211,6 +212,19 @@ namespace DonorStatement
         {
             AboutBox1 aboutBox = new AboutBox1(this);
             aboutBox.ShowDialog();
+        }
+
+        private void buttonHelp_Click(object sender, EventArgs e)
+        {
+            string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DonorStatement.pdf");
+            try
+            {
+                System.Diagnostics.Process.Start(fileName);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Unable to open help file: " + fileName);
+            }
         }
     } // Form1
 }
