@@ -14,16 +14,18 @@ namespace DonorStatement
     {
         private DonorRecord() { }
 
-        public DonorRecord(string name, string fileName, string email)
+        public DonorRecord(string name, string fileName, string email, string nameLastFirst)
         {
             Name = name;
             FileName = fileName;
             Email = email;
+            NameLastFirst = nameLastFirst;
         }
 
         public string Name { get; set; }
         public string FileName { get; set; }
         public string Email { get; set; }
+        public string NameLastFirst { get; set; }
     }
     // this class handles creating, updating and saving the document
     public class DocumentCreator
@@ -173,12 +175,18 @@ namespace DonorStatement
             if (table.Rows.Count == 0)
                 return;  // should never happen
 
-            // Get name
+            // Get name, in case one is empty, make them both equal
+            // if both empty give up
             string customerName = table.Rows[0]["Name Contact"].ToString();
-            if(string.IsNullOrWhiteSpace(customerName))
-                customerName = table.Rows[0]["Name"].ToString();
+            string nameLastFirst = table.Rows[0]["Name"].ToString();
+
+            if (string.IsNullOrWhiteSpace(customerName))
+                customerName = nameLastFirst;
             if (string.IsNullOrWhiteSpace(customerName))
                 return;  // should never happen
+
+            if (string.IsNullOrEmpty(nameLastFirst))
+                nameLastFirst = customerName;
 
             // If the first row does not have an item, skip because it is probably a time stamp
             if (string.IsNullOrWhiteSpace(table.Rows[0]["Item"].ToString()))
@@ -186,7 +194,6 @@ namespace DonorStatement
                 m_logger("Skipping user: " + customerName + " because Item column is empty");
                 return;
             }
-
 
             //create a new document.
             Word.Document oDoc;
@@ -204,25 +211,27 @@ namespace DonorStatement
             oDoc = m_word.Documents.Add(ref oTemplate, ref m_oMissing,
                 ref m_oMissing, ref m_oMissing);
 
+            // create replacement values for the bookmarks
             List<KeyValuePair<string, string>> bookMarks = new List<KeyValuePair<string, string>>();
             bookMarks.Add(new KeyValuePair<string, string>("Name", customerName));
             string date = DateTime.Now.ToString("M") + ", " + DateTime.Now.ToString("yyyy");
             bookMarks.Add(new KeyValuePair<string, string>("StatementDate", date));
-            StringBuilder builder = new StringBuilder();
-            builder.AppendLine(customerName);
-            builder.AppendLine(table.Rows[0]["Name Street1"].ToString());
+
+            StringBuilder builderToAddress = new StringBuilder();
+            builderToAddress.AppendLine(customerName);
+            builderToAddress.AppendLine(table.Rows[0]["Name Street1"].ToString());
             string street2 = table.Rows[0]["Name Street2"].ToString();
             bool bSkippedLine = false;
             if (string.IsNullOrWhiteSpace(street2))
                 bSkippedLine = true;
 
-            builder.AppendFormat("{0}, {1}  {2}", table.Rows[0]["Name City"].ToString(), table.Rows[0]["Name State"].ToString(), table.Rows[0]["Name Zip"].ToString());
+            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[0]["Name City"].ToString(), table.Rows[0]["Name State"].ToString(), table.Rows[0]["Name Zip"].ToString());
             if (bSkippedLine)
-                builder.AppendLine();
-            bookMarks.Add(new KeyValuePair<string, string>("ToAddress", builder.ToString()));
+                builderToAddress.AppendLine();
+
+            bookMarks.Add(new KeyValuePair<string, string>("ToAddress", builderToAddress.ToString()));
             bookMarks.Add(new KeyValuePair<string, string>("YearDateRange", FormMain.Config.DateRange));
-
-
+            
             //table of payments
             float total = 0;
             List<List<string>> donations = new List<List<string>>();
@@ -245,27 +254,32 @@ namespace DonorStatement
                 if (float.TryParse(paid, out thisAmount))
                     total += thisAmount;
             }
-
-            string fileName = customerName = table.Rows[0]["Name"].ToString();
-            string email = table.Rows[0]["Name E-Mail"].ToString();
-            fileName = fileName.Replace(',', '.');
-            fileName = fileName.Replace('&', '-');
-            fileName = fileName.Replace('\'', '_');
-            fileName = fileName.Replace(" ", string.Empty);
             if (total == 0)
             {
                 m_logger("Skipping: " + customerName + ", No items were found, or the item amount was $0.");
                 oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
                 return;
             }
+            string email = table.Rows[0]["Name E-Mail"].ToString();
+
+            // create filename replacing certain characters
+            string fileName = nameLastFirst;
+            fileName = fileName.Replace(',', '.');
+            fileName = fileName.Replace('&', '-');
+            fileName = fileName.Replace('\'', '_');
+            fileName = fileName.Replace(" ", string.Empty);
             fileName += ".pdf";
+            fileName = Path.Combine(FormMain.Config.OutputDirectory, fileName);
 
             string amount = string.Format("{0:C2}", total);
             bookMarks.Add(new KeyValuePair<string, string>("Total", amount));
 
-            CreateDocument(bookMarks, donations, "TablePayments", fileName, oDoc, customerName, email);
+            CreatePdfFile(bookMarks, donations, oDoc, fileName);
+
+            DonorRecord donorRecord = new DonorRecord(customerName, fileName, email, nameLastFirst);
+            m_Files.Add(donorRecord);
             m_word.Visible = false;
-        }
+        } // end CreateDoc
 
 
         /// <summary>
@@ -273,29 +287,24 @@ namespace DonorStatement
         /// </summary>
         /// <param name="bookMarks">Each item in this list is a bookmark (key) in the word document that must be updated with the value</param>
         /// <param name="donations">Each item in the list represents one row in the table with name tableName</param>
-        /// <param name="name">name of file to create</param>
-        /// <param name="tableName">boorkMark for table to dupate</param>
-        /// <param name="email">email representing this document</param>
         /// <param name="oDoc">The document</param>
+        /// <param name="fileName">name of PDF file</param>
         /// <returns>false on any error</returns>
-        private bool CreateDocument(List<KeyValuePair<string, string>> bookMarks, List<List<string>> donations, string tableName, string fileName,
-            Word.Document oDoc, string customerName, string email)
+        private bool CreatePdfFile(List<KeyValuePair<string, string>> bookMarks, List<List<string>> donations, Word.Document oDoc, string fileName)
         {
-            string fullFileName = Path.Combine(FormMain.Config.OutputDirectory, fileName);
-            m_logger("Creating: " + fullFileName);
+            m_logger("Creating: " + fileName);
             bool result = false;
             foreach (KeyValuePair<string, string> item in bookMarks)
             {
                 if (!UpdateBookmark(item.Key, oDoc, item.Value))
                     result = false;
             }
-            if (!UpdateTable(oDoc, tableName, donations))
+            if (!UpdateTable(oDoc, "TablePayments", donations))
             {
                 result = false;
             }
-            m_Files.Add(new DonorRecord(customerName, fullFileName, email));
 
-            SavePdf(oDoc, fullFileName);
+            SavePdf(oDoc, fileName);
             oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
 
             return result;
@@ -388,9 +397,9 @@ namespace DonorStatement
             {
                 using (StreamWriter file = new StreamWriter(fileName))
                 {
-                    file.WriteLine("CustomerName,FileName, Email");
+                    file.WriteLine("NameLastFirst, Name,FileName, Email");
                     foreach (var item in m_Files)
-                        file.WriteLine(string.Format("\"{0}\",\"{1}\",\"{2}\"", item.Name, item.FileName, item.Email));
+                        file.WriteLine(string.Format("\"{0}\",\"{1}\",\"{2}\",\"{3}\"", item.NameLastFirst, item.Name, item.FileName, item.Email));
                 }
             }
             catch (Exception ex)
