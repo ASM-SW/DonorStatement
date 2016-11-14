@@ -95,6 +95,7 @@ namespace DonorStatement
                     }
                     Directory.Delete(FormMain.Config.OutputDirectory, true);
                     System.Threading.Thread.Sleep(1000);
+                    m_Files.Clear();
                 }
                 Directory.CreateDirectory(FormMain.Config.OutputDirectory);
             }
