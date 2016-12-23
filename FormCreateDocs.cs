@@ -54,7 +54,7 @@ namespace DonorStatement
                 m_docCreator.CreateDocsDone();
                 return;
             }
-            m_docCreator.CheckForBookmarks();
+            m_docCreator.CheckForBookmarksAndTables();
 
             List<string> names;
             m_parser.GetNameList(out names);

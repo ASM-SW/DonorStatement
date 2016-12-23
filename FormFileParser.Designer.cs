@@ -48,14 +48,14 @@ namespace DonorStatement
             this.butParse.UseVisualStyleBackColor = true;
             this.butParse.Click += new System.EventHandler(this.butParse_Click);
             // 
-            // checkedListItems
+            // listItems
             // 
             this.listItems.FormattingEnabled = true;
             this.listItems.Location = new System.Drawing.Point(35, 41);
             this.listItems.Margin = new System.Windows.Forms.Padding(2);
             this.listItems.Name = "listItems";
             this.listItems.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.listItems.Size = new System.Drawing.Size(425, 199);
+            this.listItems.Size = new System.Drawing.Size(601, 199);
             this.listItems.TabIndex = 1;
             // 
             // textFileHasBeenRead
@@ -96,7 +96,7 @@ namespace DonorStatement
             this.AccessibleDescription = "Select Items to include in letters.";
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(509, 270);
+            this.ClientSize = new System.Drawing.Size(658, 270);
             this.Controls.Add(this.buttonClearSelections);
             this.Controls.Add(this.buttonSelectAll);
             this.Controls.Add(this.textFileHasBeenRead);

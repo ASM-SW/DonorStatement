@@ -41,6 +41,7 @@ namespace DonorStatement
             this.textConfigFile = new System.Windows.Forms.TextBox();
             this.textDateRange = new System.Windows.Forms.TextBox();
             this.labelDateRange = new System.Windows.Forms.Label();
+            this.cbReportOtherPayments = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // fileDlgInputFile
@@ -51,7 +52,7 @@ namespace DonorStatement
             // butInputFile
             // 
             this.butInputFile.AutoSize = true;
-            this.butInputFile.Location = new System.Drawing.Point(30, 8);
+            this.butInputFile.Location = new System.Drawing.Point(32, 8);
             this.butInputFile.Margin = new System.Windows.Forms.Padding(2);
             this.butInputFile.Name = "butInputFile";
             this.butInputFile.Size = new System.Drawing.Size(60, 23);
@@ -66,7 +67,7 @@ namespace DonorStatement
             this.textInputFile.Margin = new System.Windows.Forms.Padding(2);
             this.textInputFile.Name = "textInputFile";
             this.textInputFile.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textInputFile.Size = new System.Drawing.Size(249, 20);
+            this.textInputFile.Size = new System.Drawing.Size(696, 20);
             this.textInputFile.TabIndex = 1;
             // 
             // textWordTemplate
@@ -75,7 +76,7 @@ namespace DonorStatement
             this.textWordTemplate.Margin = new System.Windows.Forms.Padding(2);
             this.textWordTemplate.Name = "textWordTemplate";
             this.textWordTemplate.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textWordTemplate.Size = new System.Drawing.Size(249, 20);
+            this.textWordTemplate.Size = new System.Drawing.Size(696, 20);
             this.textWordTemplate.TabIndex = 3;
             // 
             // butWordTemplate
@@ -92,7 +93,7 @@ namespace DonorStatement
             // 
             // butOutputFolder
             // 
-            this.butOutputFolder.Location = new System.Drawing.Point(9, 74);
+            this.butOutputFolder.Location = new System.Drawing.Point(14, 74);
             this.butOutputFolder.Margin = new System.Windows.Forms.Padding(2);
             this.butOutputFolder.Name = "butOutputFolder";
             this.butOutputFolder.Size = new System.Drawing.Size(78, 21);
@@ -107,17 +108,17 @@ namespace DonorStatement
             this.textOutputDirectory.Margin = new System.Windows.Forms.Padding(2);
             this.textOutputDirectory.Name = "textOutputDirectory";
             this.textOutputDirectory.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textOutputDirectory.Size = new System.Drawing.Size(249, 20);
+            this.textOutputDirectory.Size = new System.Drawing.Size(696, 20);
             this.textOutputDirectory.TabIndex = 5;
             // 
             // textConfigFile
             // 
             this.textConfigFile.Enabled = false;
-            this.textConfigFile.Location = new System.Drawing.Point(9, 248);
+            this.textConfigFile.Location = new System.Drawing.Point(-2, 242);
             this.textConfigFile.Margin = new System.Windows.Forms.Padding(2);
             this.textConfigFile.Name = "textConfigFile";
             this.textConfigFile.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textConfigFile.Size = new System.Drawing.Size(529, 20);
+            this.textConfigFile.Size = new System.Drawing.Size(781, 20);
             this.textConfigFile.TabIndex = 6;
             // 
             // textDateRange
@@ -126,26 +127,38 @@ namespace DonorStatement
             this.textDateRange.Margin = new System.Windows.Forms.Padding(2);
             this.textDateRange.Name = "textDateRange";
             this.textDateRange.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textDateRange.Size = new System.Drawing.Size(249, 20);
+            this.textDateRange.Size = new System.Drawing.Size(696, 20);
             this.textDateRange.TabIndex = 8;
             this.textDateRange.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // labelDateRange
             // 
             this.labelDateRange.AutoSize = true;
-            this.labelDateRange.Location = new System.Drawing.Point(6, 113);
+            this.labelDateRange.Location = new System.Drawing.Point(27, 113);
             this.labelDateRange.Name = "labelDateRange";
             this.labelDateRange.Size = new System.Drawing.Size(65, 13);
             this.labelDateRange.TabIndex = 10;
             this.labelDateRange.Text = "Date Range";
+            // 
+            // cbReportOtherPayments
+            // 
+            this.cbReportOtherPayments.AutoSize = true;
+            this.cbReportOtherPayments.Location = new System.Drawing.Point(101, 161);
+            this.cbReportOtherPayments.Name = "cbReportOtherPayments";
+            this.cbReportOtherPayments.Size = new System.Drawing.Size(238, 17);
+            this.cbReportOtherPayments.TabIndex = 11;
+            this.cbReportOtherPayments.Text = "Report non-donation in Other Payments table";
+            this.cbReportOtherPayments.UseVisualStyleBackColor = true;
+            this.cbReportOtherPayments.CheckedChanged += new System.EventHandler(this.cbReportOtherPayments_CheckedChanged);
             // 
             // FormConfiguration
             // 
             this.AccessibleDescription = "Fill in the following items:";
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(538, 273);
+            this.ClientSize = new System.Drawing.Size(808, 273);
             this.ControlBox = false;
+            this.Controls.Add(this.cbReportOtherPayments);
             this.Controls.Add(this.labelDateRange);
             this.Controls.Add(this.textDateRange);
             this.Controls.Add(this.textConfigFile);
@@ -180,5 +193,6 @@ namespace DonorStatement
         private System.Windows.Forms.TextBox textConfigFile;
         private System.Windows.Forms.TextBox textDateRange;
         private System.Windows.Forms.Label labelDateRange;
+        private System.Windows.Forms.CheckBox cbReportOtherPayments;
     }
 }

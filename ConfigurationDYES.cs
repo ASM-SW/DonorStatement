@@ -28,11 +28,13 @@ namespace DonorStatement
         public string ReturnAddress { get; set; }               // Return address:  4 lines separate by \n
         public List<string> ItemListSelected { get; set; }  // List of all Items selected to be included in the report
         public string ConfigFileName { get; set; }              // name of file containing configuration information
+        public bool ReportOtherPayments { get; set; }             // Report items that are not included in the donation in the Other Payments table
 
         public ConfigurationDYES()
         {
             ItemListSelected = new List<string>();
             OutputFileListFileName = "1FileList.csv";
+            ReportOtherPayments = false;
 
             string appData = Environment.GetEnvironmentVariable("APPDATA");
             string dataDir = Path.Combine(appData, "DonorStatement");

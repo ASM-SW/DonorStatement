@@ -63,7 +63,7 @@ namespace DonorStatement
             this.lbLogging.Location = new System.Drawing.Point(0, 405);
             this.lbLogging.Name = "lbLogging";
             this.lbLogging.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.lbLogging.Size = new System.Drawing.Size(597, 134);
+            this.lbLogging.Size = new System.Drawing.Size(820, 134);
             this.lbLogging.TabIndex = 1;
             // 
             // contextMenuStrip1
@@ -98,10 +98,10 @@ namespace DonorStatement
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Location = new System.Drawing.Point(11, 115);
+            this.panel1.Location = new System.Drawing.Point(5, 117);
             this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(561, 276);
+            this.panel1.Size = new System.Drawing.Size(809, 276);
             this.panel1.TabIndex = 4;
             // 
             // butNext
@@ -177,7 +177,7 @@ namespace DonorStatement
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(597, 539);
+            this.ClientSize = new System.Drawing.Size(820, 539);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonHelp);
             this.Controls.Add(this.buttonAbout);

@@ -10,6 +10,10 @@ using Word = Microsoft.Office.Interop.Word;
 
 namespace DonorStatement
 {
+
+    /// <summary>
+    /// Class to contain one donor.  This is put into a list and searialized out to a csv file in DoucmentCreator.SaveFilesList().
+    /// </summary>
     public class DonorRecord
     {
         private DonorRecord() { }
@@ -27,6 +31,21 @@ namespace DonorStatement
         public string Email { get; set; }
         public string NameLastFirst { get; set; }
     }
+
+    /// <summary>
+    /// Class to contain one payement.
+    /// </summary>
+    public class PaymentItem
+    {
+        public PaymentItem()
+        {
+            Fields = new List<string>();
+            IsDonation = false;             // tax deductible based on which items are selected.
+        }
+        public List<string> Fields { get; set; }
+        public bool IsDonation { get; set; }
+    }
+    
     // this class handles creating, updating and saving the document
     public class DocumentCreator
     {
@@ -61,7 +80,6 @@ namespace DonorStatement
             "ToAddress",
             "YearDateRange",
             "Total",
-            "TablePayments"
         };
 
         private DocumentCreator() { }
@@ -137,7 +155,7 @@ namespace DonorStatement
             return true;
         }
 
-        public bool CheckForBookmarks()
+        public bool CheckForBookmarksAndTables()
         {
             StringBuilder msg = new StringBuilder("WARNING-  Word template file is missing the following bookmarks: ");
             int cnt = 0;
@@ -159,12 +177,35 @@ namespace DonorStatement
                     msg.AppendFormat(" \"{0}\"", bookMarkName);
                 }
             }
-            oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
             if (cnt > 0)
             {
                 MessageBox.Show(msg.ToString());
                 result = false;
             }
+
+            // now check for tables.  The table Title is the Title text box on the Alt Text tab of the Table Properties
+            msg = new StringBuilder("WARNING-  Word template file is missing the following tables: ");
+            cnt = 0;
+            Word.Table table;
+            if (!FindTable("TablePayments", oDoc, out table))
+            {
+                cnt++;
+                msg.AppendFormat(" \"{0}\"", "TablePayments");
+            }
+            if (FormMain.Config.ReportOtherPayments)
+                if (!FindTable("TableOtherPayments", oDoc, out table))
+                {
+                    if (cnt++ > 0)
+                        msg.Append(", ");
+                    msg.AppendFormat(" \"{0}\"", "TableOtherPaymetns");
+                }
+            if (cnt > 0)
+            {
+                MessageBox.Show(msg.ToString());
+                result = false;
+            }
+
+            oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
             return result;
         }
 
@@ -234,30 +275,35 @@ namespace DonorStatement
             bookMarks.Add(new KeyValuePair<string, string>("YearDateRange", FormMain.Config.DateRange));
             
             //table of payments
+            float totalDoations = 0;
             float total = 0;
-            List<List<string>> donations = new List<List<string>>();
+            List<PaymentItem> payments = new List<PaymentItem>();
             foreach (DataRow row in table.Rows)
             {
-                List<string> aDonation = new List<string>();
+                PaymentItem payment = new PaymentItem();
                 string item = row["Item"].ToString();
-                if (FormMain.Config.ItemListSelected.BinarySearch(item) < 0)
-                    continue;
+                if (FormMain.Config.ItemListSelected.BinarySearch(item) > 0)
+                    payment.IsDonation = true;
 
-                aDonation.Add(row["Date"].ToString());
-                aDonation.Add(item);                
-                aDonation.Add(row["Memo"].ToString());
+                payment.Fields.Add(row["Date"].ToString());
+                payment.Fields.Add(item);
+                payment.Fields.Add(row["Memo"].ToString());
                 string paid = row["Paid Amount"].ToString();
-                aDonation.Add(paid);
+                payment.Fields.Add(paid);
 
-                donations.Add(aDonation);
+                payments.Add(payment);
 
                 float thisAmount = 0;
                 if (float.TryParse(paid, out thisAmount))
+                {
                     total += thisAmount;
+                    if (payment.IsDonation)
+                        totalDoations += thisAmount;
+                }
             }
             if (total == 0)
             {
-                m_logger("Skipping: " + customerName + ", No items were found, or the item amount was $0.");
+                m_logger("Skipping: " + customerName + ", No items were found, or item amount was zero.");
                 oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
                 return;
             }
@@ -272,10 +318,10 @@ namespace DonorStatement
             fileName += ".pdf";
             fileName = Path.Combine(FormMain.Config.OutputDirectory, fileName);
 
-            string amount = string.Format("{0:C2}", total);
+            string amount = string.Format("{0:C2}", totalDoations);
             bookMarks.Add(new KeyValuePair<string, string>("Total", amount));
 
-            CreatePdfFile(bookMarks, donations, oDoc, fileName);
+            CreatePdfFile(bookMarks, payments, oDoc, fileName);
 
             DonorRecord donorRecord = new DonorRecord(customerName, fileName, email, nameLastFirst);
             m_Files.Add(donorRecord);
@@ -287,11 +333,11 @@ namespace DonorStatement
         /// Creates the PDF document for a given record
         /// </summary>
         /// <param name="bookMarks">Each item in this list is a bookmark (key) in the word document that must be updated with the value</param>
-        /// <param name="donations">Each item in the list represents one row in the table with name tableName</param>
+        /// <param name="payments">list of payments</param>
         /// <param name="oDoc">The document</param>
         /// <param name="fileName">name of PDF file</param>
         /// <returns>false on any error</returns>
-        private bool CreatePdfFile(List<KeyValuePair<string, string>> bookMarks, List<List<string>> donations, Word.Document oDoc, string fileName)
+        private bool CreatePdfFile(List<KeyValuePair<string, string>> bookMarks, List<PaymentItem> payments, Word.Document oDoc, string fileName)
         {
             m_logger("Creating: " + fileName);
             bool result = false;
@@ -300,18 +346,33 @@ namespace DonorStatement
                 if (!UpdateBookmark(item.Key, oDoc, item.Value))
                     result = false;
             }
-            if (!UpdateTable(oDoc, "TablePayments", donations))
+            if (!UpdateTable(oDoc, "TablePayments", payments, true))
             {
                 result = false;
             }
 
+            if (FormMain.Config.ReportOtherPayments)
+            {
+                if (!UpdateTable(oDoc, "TableOtherPayments", payments, false))
+                {
+                    result = false;
+                }
+            }
             SavePdf(oDoc, fileName);
             oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
 
             return result;
         }
 
-        private bool UpdateTable(Word.Document oDoc, string tableName, List<List<string>> rows)
+        /// <summary>
+        /// Update a table in the word document
+        /// </summary>
+        /// <param name="oDoc"></param>
+        /// <param name="tableName">This is the Alt text for the table in word.  Used to find the table to udpate</param>
+        /// <param name="rows">list of payments</param>
+        /// <param name="isDonation">Only adds row if the isDonation property of the row matches this parameter </param>
+        /// <returns></returns>
+        private bool UpdateTable(Word.Document oDoc, string tableName, List<PaymentItem> rows, bool isDonation)
         {
             Word.Table table;
             if (!FindTable(tableName, oDoc, out table))
@@ -319,14 +380,38 @@ namespace DonorStatement
                 m_logger("Unable to find table to update: " + tableName);
                 return false;
             }
-            foreach (List<string> rowItem in rows)
+            bool bAddedRow = false;
+            foreach (PaymentItem item in rows)
             {
-                AppendRowToTable(rowItem, ref table);
+                if (item.IsDonation == isDonation)
+                {
+                    AppendRowToTable(item.Fields, ref table);
+                    bAddedRow = true;
+                }
             }
+
+            if (!bAddedRow)
+            {
+                // Add a comment to the table about no payments
+                PaymentItem item = new PaymentItem();
+                item.IsDonation = isDonation;
+                item.Fields.Add(string.Empty);
+                if (isDonation)
+                    item.Fields.Add("No Donations");
+                else
+                    item.Fields.Add("No Other Payments");
+                AppendRowToTable(item.Fields, ref table);
+            }
+                
 
             return true;
         }
 
+        /// <summary>
+        /// Does the actual work of adding the row into the table in the document
+        /// </summary>
+        /// <param name="values">list of values used to create the row in the table</param>
+        /// <param name="table">the table to modify</param>
         private void AppendRowToTable(List<string> values, ref Word.Table table)
         {
             Word.Row row = table.Rows.Add(System.Reflection.Missing.Value);
@@ -337,6 +422,13 @@ namespace DonorStatement
             }
         }
 
+        /// <summary>
+        /// UPdates a bookmark in the word document
+        /// </summary>
+        /// <param name="bookMarkName">name of the bookmark to update</param>
+        /// <param name="oDoc">the word document</param>
+        /// <param name="value">the value to set the bookmark to</param>
+        /// <returns></returns>
         private bool UpdateBookmark(string bookMarkName, Word.Document oDoc, string value)
         {
             Word.Bookmark bookMark = null;
@@ -378,6 +470,11 @@ namespace DonorStatement
             return false;
         }
 
+        /// <summary>
+        /// Save the word doc as a PDF file
+        /// </summary>
+        /// <param name="oDoc">the document</param>
+        /// <param name="fileName">full path/name of PDF file</param>
         private void SavePdf(Word.Document oDoc, string fileName)
         {
             try
@@ -391,6 +488,9 @@ namespace DonorStatement
             }
         }
 
+        /// <summary>
+        /// writes out m_files to the 1FileList.csv
+        /// </summary>
         public void SaveFileList()
         {
             string fileName = Path.Combine(FormMain.Config.OutputDirectory, "1FileList.csv");

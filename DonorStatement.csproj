@@ -49,6 +49,7 @@
     <WarningLevel>3</WarningLevel>
     <DebugSymbols>true</DebugSymbols>
     <LangVersion>4</LangVersion>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>

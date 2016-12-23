@@ -25,6 +25,7 @@ namespace DonorStatement
             textOutputDirectory.Text = FormMain.Config.OutputDirectory;
             textConfigFile.Text = "Configuration file: " + FormMain.Config.ConfigFileName;
             textDateRange.Text = FormMain.Config.DateRange;
+            cbReportOtherPayments.Checked = FormMain.Config.ReportOtherPayments;
         }
 
         private bool SelectFile(ref string fileName, string fileFilter)
@@ -125,6 +126,11 @@ namespace DonorStatement
                 errorMsg = msg.ToString();
 
             return res;
+        }
+
+        private void cbReportOtherPayments_CheckedChanged(object sender, EventArgs e)
+        {
+            FormMain.Config.ReportOtherPayments = cbReportOtherPayments.Checked;
         }
     }
 }
