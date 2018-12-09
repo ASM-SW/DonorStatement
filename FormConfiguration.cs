@@ -1,4 +1,4 @@
-﻿// Copyright © 2016  ASM-SW
+﻿// Copyright © 2016-2018  ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;

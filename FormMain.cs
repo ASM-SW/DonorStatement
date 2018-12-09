@@ -1,4 +1,4 @@
-﻿// Copyright © 2016  ASM-SW
+﻿// Copyright © 2016-2018  ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
@@ -46,6 +46,7 @@ namespace DonorStatement
             // Add forms in the order to be displayed
             m_forms.Add(new FormConfiguration());
             m_forms.Add(new FormFileParser(ref m_parser));
+            m_forms.Add(new FormItemIgnore());
             m_forms.Add(new FormCreateDocs(ref m_parser, ref m_docCreator, ref m_loggerDelegate));
 
             // initial configuration for each form

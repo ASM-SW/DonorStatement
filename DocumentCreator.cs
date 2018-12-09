@@ -1,4 +1,4 @@
-﻿// Copyright © 2016  ASM-SW
+﻿// Copyright © 2016-2018  ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
@@ -290,6 +290,10 @@ namespace DonorStatement
                 payment.Fields.Add(row["Memo"].ToString());
                 string paid = row["Paid Amount"].ToString();
                 payment.Fields.Add(paid);
+
+                //check to see if the item should be ignored, if so drop it
+                if (FormMain.Config.ItemListIgnore.BinarySearch(item) >= 0)
+                    continue;
 
                 payments.Add(payment);
 

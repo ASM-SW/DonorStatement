@@ -90,6 +90,12 @@
     <Compile Include="FormCreateDocs.Designer.cs">
       <DependentUpon>FormCreateDocs.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormItemIgnore.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormItemIgnore.Designer.cs">
+      <DependentUpon>FormItemIgnore.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormFileParser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -113,6 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCreateDocs.resx">
       <DependentUpon>FormCreateDocs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormItemIgnore.resx">
+      <DependentUpon>FormItemIgnore.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormFileParser.resx">
       <DependentUpon>FormFileParser.cs</DependentUpon>
