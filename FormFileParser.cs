@@ -1,13 +1,7 @@
-﻿// Copyright © 2016  ASM-SW
+﻿// Copyright © 2016-2019 ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DonorStatement
@@ -37,16 +31,15 @@ namespace DonorStatement
                 textFileHasBeenRead.Text = "Input File has not been read.  Click on Parse to read it and update the list of items.";
         }
 
-        private void butParse_Click(object sender, EventArgs e)
+        private void ButtonParse_Click(object sender, EventArgs e)
         {
             m_parser.ParseInputFile();
-            List<string> itemListFromFile;
-            m_parser.GetItemList(out itemListFromFile);
+            m_parser.GetItemList(out List<string> itemListFromFile);
+            itemListFromFile.Sort();
 
             // replace item list in configuration with new one.
             // also populate control
             listItems.Items.Clear();
-            List<string> newItemList = new List<string>();
             foreach (string item in itemListFromFile)
             {
                 // if item was in old list put in new list with same selection value.
@@ -57,8 +50,20 @@ namespace DonorStatement
                 }
                 else
                     listItems.Items.Add(item);
-                newItemList.Add(item);
+
             }
+
+            // remove any items from ItemListNotSelected that is not in itemListFromFile
+            List<int> indexItemsToRemove = new List<int>();
+            for (int i = 0; i < FormMain.Config.ItemListNotSelected.Count; i++)
+            {
+                if (itemListFromFile.BinarySearch(FormMain.Config.ItemListNotSelected[i]) < 0)
+                    indexItemsToRemove.Insert(0, i);  
+            }
+            // The iteration and remove is working because theindexItemsToRemove is automatically reverse sorted by inserting at the beginning, see above
+            foreach (int item in indexItemsToRemove)
+                FormMain.Config.ItemListNotSelected.RemoveAt(item);
+
             UpdateConfigurationWithSelectedItems();
 
             // scroll to top
@@ -79,10 +84,18 @@ namespace DonorStatement
         private void UpdateConfigurationWithSelectedItems()
         {
             FormMain.Config.ItemListSelected.Clear();
-            foreach (string item in listItems.SelectedItems)
-                FormMain.Config.ItemListSelected.Add(item);
-
+            for (int i = 0; i < listItems.Items.Count; i++)
+            {
+                if (listItems.GetSelected(i))
+                    FormMain.Config.ItemListSelected.Add(listItems.GetItemText(listItems.Items[i]));
+                else
+                {
+                    if (!FormMain.Config.ItemListNotSelected.Contains(listItems.Items[i].ToString()))
+                        FormMain.Config.ItemListNotSelected.Add(listItems.GetItemText(listItems.Items[i]));
+                }
+            }
             FormMain.Config.ItemListSelected.Sort();
+            FormMain.Config.ItemListNotSelected.Sort();
         }
 
         private void CheckUnCheckAll(bool bSelect)
@@ -98,16 +111,16 @@ namespace DonorStatement
             listItems.Visible = true;
         }
 
-        private void buttonSelectAll_Click(object sender, EventArgs e)
+        private void ButtonSelectAll_Click(object sender, EventArgs e)
         {
             CheckUnCheckAll(true);
         }
 
-        private void buttonClearSelections_Click(object sender, EventArgs e)
+        private void ButtonClearSelections_Click(object sender, EventArgs e)
         {
             CheckUnCheckAll(false);
         }
 
-    
+
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright © 2016-2018  ASM-SW
+﻿// Copyright © 2016-2019  ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
@@ -282,7 +282,8 @@ namespace DonorStatement
             {
                 PaymentItem payment = new PaymentItem();
                 string item = row["Item"].ToString();
-                if (FormMain.Config.ItemListSelected.BinarySearch(item) > 0)
+                // Binary search returns  0 based index of find, negative number if not found
+                if (FormMain.Config.ItemListSelected.BinarySearch(item) >= 0)
                     payment.IsDonation = true;
 
                 payment.Fields.Add(row["Date"].ToString());

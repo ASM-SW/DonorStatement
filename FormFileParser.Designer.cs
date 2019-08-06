@@ -1,4 +1,4 @@
-﻿// Copyright © 2016  ASM-SW
+﻿// Copyright © 2016-2019 ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 namespace DonorStatement
 {
@@ -46,7 +46,7 @@ namespace DonorStatement
             this.butParse.TabIndex = 0;
             this.butParse.Text = "Parse Input File";
             this.butParse.UseVisualStyleBackColor = true;
-            this.butParse.Click += new System.EventHandler(this.butParse_Click);
+            this.butParse.Click += new System.EventHandler(this.ButtonParse_Click);
             // 
             // listItems
             // 
@@ -78,7 +78,7 @@ namespace DonorStatement
             this.buttonSelectAll.TabIndex = 3;
             this.buttonSelectAll.Text = "Select All";
             this.buttonSelectAll.UseVisualStyleBackColor = true;
-            this.buttonSelectAll.Click += new System.EventHandler(this.buttonSelectAll_Click);
+            this.buttonSelectAll.Click += new System.EventHandler(this.ButtonSelectAll_Click);
             // 
             // buttonClearSelections
             // 
@@ -89,7 +89,7 @@ namespace DonorStatement
             this.buttonClearSelections.TabIndex = 4;
             this.buttonClearSelections.Text = "Clear Selections";
             this.buttonClearSelections.UseVisualStyleBackColor = true;
-            this.buttonClearSelections.Click += new System.EventHandler(this.buttonClearSelections_Click);
+            this.buttonClearSelections.Click += new System.EventHandler(this.ButtonClearSelections_Click);
             // 
             // FormFileParser
             // 
