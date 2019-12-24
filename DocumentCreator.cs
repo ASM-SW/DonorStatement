@@ -273,10 +273,14 @@ namespace DonorStatement
 
             bookMarks.Add(new KeyValuePair<string, string>("ToAddress", builderToAddress.ToString()));
             bookMarks.Add(new KeyValuePair<string, string>("YearDateRange", FormMain.Config.DateRange));
-            
+
+            // used to convert numbers to strings
+            const string formatNumberSmall = ",0.00";  // 1.12
+            const string formatNumberLarge = "0,0.00"; // 123,456.78
+
             //table of payments
-            float totalDoations = 0;
-            float total = 0;
+            decimal totalDoations = 0;
+            decimal total = 0;
             List<PaymentItem> payments = new List<PaymentItem>();
             foreach (DataRow row in table.Rows)
             {
@@ -290,21 +294,20 @@ namespace DonorStatement
                 payment.Fields.Add(item);
                 payment.Fields.Add(row["Memo"].ToString());
                 string paid = row["Paid Amount"].ToString();
-                payment.Fields.Add(paid);
+                decimal thisAmount = 0;
+                if (decimal.TryParse(paid, out thisAmount))
+                {
+                    total += thisAmount;
+                    if (payment.IsDonation)
+                        totalDoations += thisAmount;
+                }
+                payment.Fields.Add(thisAmount.ToString(thisAmount < 10 ? formatNumberSmall : formatNumberLarge, System.Globalization.CultureInfo.InvariantCulture));
 
                 //check to see if the item should be ignored, if so drop it
                 if (FormMain.Config.ItemListIgnore.BinarySearch(item) >= 0)
                     continue;
 
                 payments.Add(payment);
-
-                float thisAmount = 0;
-                if (float.TryParse(paid, out thisAmount))
-                {
-                    total += thisAmount;
-                    if (payment.IsDonation)
-                        totalDoations += thisAmount;
-                }
             }
             if (total == 0)
             {
