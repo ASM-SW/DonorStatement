@@ -1,4 +1,4 @@
-﻿// Copyright © 2016-2019 ASM-SW
+﻿// Copyright © 2016-2020 ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 namespace DonorStatement
 {
@@ -93,7 +93,7 @@ namespace DonorStatement
             // 
             // FormFileParser
             // 
-            this.AccessibleDescription = "Select Items to include in letters.";
+            this.AccessibleDescription = "Select Items to include as donations.";
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(658, 270);
