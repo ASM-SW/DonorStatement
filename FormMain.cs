@@ -61,6 +61,7 @@ namespace DonorStatement
 
             label1.Text = "Version: " +Application.ProductVersion;
             LogMessage(label1.Text);
+            LogMessage("Configuration data from last run: " + Config.ConfigFileName);
 
             // load first form
             SwitchPanelForm(PanelNavDirection.forward);
