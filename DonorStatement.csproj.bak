@@ -38,7 +38,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
-    <LangVersion>latestmajor</LangVersion>
     <!--<LangVersion>7.0</LangVersion>-->
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
@@ -116,7 +115,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="FormConfiguration.resx">
       <DependentUpon>FormConfiguration.cs</DependentUpon>

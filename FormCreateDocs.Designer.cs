@@ -53,7 +53,7 @@ namespace DonorStatement
             this.buttonStart.TabIndex = 0;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
-            this.buttonStart.Click += new System.EventHandler(this.startButton_Click);
+            this.buttonStart.Click += new System.EventHandler(this.StartButton_Click);
             // 
             // buttonStop
             // 
@@ -63,13 +63,13 @@ namespace DonorStatement
             this.buttonStop.TabIndex = 2;
             this.buttonStop.Text = "Stop";
             this.buttonStop.UseVisualStyleBackColor = true;
-            this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
+            this.buttonStop.Click += new System.EventHandler(this.ButtonStop_Click);
             // 
             // backgroundWorker1
             // 
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundWorker1_ProgressChanged);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundWorker1_RunWorkerCompleted);
             // 
             // labelProgress
             // 
@@ -87,7 +87,7 @@ namespace DonorStatement
             this.buttonReloadFile.TabIndex = 5;
             this.buttonReloadFile.Text = "Reload File";
             this.buttonReloadFile.UseVisualStyleBackColor = true;
-            this.buttonReloadFile.Click += new System.EventHandler(this.buttonReloadFile_Click);
+            this.buttonReloadFile.Click += new System.EventHandler(this.ButtonReloadFile_Click);
             // 
             // FormCreateDocs
             // 

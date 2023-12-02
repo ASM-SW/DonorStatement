@@ -1,8 +1,10 @@
-﻿// Copyright © 2016-2019  ASM-SW
+﻿// Copyright © 2016-2023  ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -39,7 +41,7 @@ namespace DonorStatement
     {
         public PaymentItem()
         {
-            Fields = new List<string>();
+            Fields = [];
             IsDonation = false;             // tax deductible based on which items are selected.
         }
         public List<string> Fields { get; set; }
@@ -52,35 +54,53 @@ namespace DonorStatement
         private Word.Application m_word = null;
         private object m_oMissing = System.Reflection.Missing.Value;
         //private object oEndOfDoc = @"\endofdoc"; /* \endofdoc is a predefined bookmark */
-        private LogMessageDelegate m_logger;
-        private List<DonorRecord> m_Files = new List<DonorRecord>();
+        private readonly LogMessageDelegate m_logger;
+        private readonly List<DonorRecord> m_Files = [];
 
         // List of colun names used for report.  This must be manually maintained.
         // used to check if DataTable has the correct columns
-        private List<string> m_requiredColumnNames = new List<string>
-        {
-            "Date",
-            "Memo",
-            "Name Contact",
-            "Name",
-            "Item",
-            "Name E-Mail",
-            "Name Street1",
-            "Name Street2",
-            "Name City",
-            "Name State",
-            "Name Zip",
-            "Paid Amount"
-        };
+        /*
+        column mapping
+        Req Desktop          online           note
+        --- ---------------  ---------------- ---------------------------------------
+        X   Date             Date   
+        x   Item             Name             new product servcie does not have the  xxxx:
+        X   Memo             Description    
+        X   Name             Customer name    last name, first names
+        x   Name City        Billing city   
+        X   Name Contact                      first last,  no commas
+        x   Name E-Mail      Email address
+        x   Name State       Billing state  
+        x   Name Street1     Billing address  billing address may include multiple lines separate by ctrl chars
+        x   Name Street2        
+        x   Name Zip         Billing ZIP code   
+        x   Paid Amount      Amount line   new has $ and commas
+            Account          Account name     old had # + name, new just name
+            Name Phone #        
+            Type        
 
-        private List<string> m_requiredBookmarkNames = new List<string>
-        {
+        */
+        private static readonly List<string> m_requiredColumnNames =
+        [
+            "Date",
+            "Name",       // name of purchase
+            "Billing city",
+            "Customer name",   // last, first
+            "Email address",
+            "Billing state",
+            "Billing address",
+            "Billing ZIP code",
+            "Amount line"          // has $ and commas
+        ];
+
+        private static readonly List<string> m_requiredBookmarkNames =
+        [
             "Name",
             "StatementDate",
             "ToAddress",
             "YearDateRange",
             "Total",
-        };
+        ];
 
         private DocumentCreator() { }
 
@@ -136,7 +156,7 @@ namespace DonorStatement
 
         public bool CheckForColumns(ref List<string> columnNames)
         {
-            StringBuilder msg = new StringBuilder("ERROR - CSV input file is missing the following columns: ");
+            StringBuilder msg = new("ERROR - CSV input file is missing the following columns: ");
             int cnt = 0;
             foreach (string name in m_requiredColumnNames)
             {
@@ -157,12 +177,11 @@ namespace DonorStatement
 
         public bool CheckForBookmarksAndTables()
         {
-            StringBuilder msg = new StringBuilder("WARNING-  Word template file is missing the following bookmarks: ");
+            StringBuilder msg = new("WARNING-  Word template file is missing the following bookmarks: ");
             int cnt = 0;
             Word.Document oDoc;
 
-            if (m_word == null)
-                m_word = new Word.Application();
+            m_word ??= new Word.Application();  // only creates new if m_word is null
 
             object oTemplate = FormMain.Config.WordTemplateFileName;
             oDoc = m_word.Documents.Add(ref oTemplate, ref m_oMissing, ref m_oMissing, ref m_oMissing);
@@ -186,8 +205,7 @@ namespace DonorStatement
             // now check for tables.  The table Title is the Title text box on the Alt Text tab of the Table Properties
             msg = new StringBuilder("WARNING-  Word template file is missing the following tables: ");
             cnt = 0;
-            Word.Table table;
-            if (!FindTable("TablePayments", oDoc, out table))
+            if (!FindTable("TablePayments", oDoc, out Word.Table table))
             {
                 cnt++;
                 msg.AppendFormat(" \"{0}\"", "TablePayments");
@@ -211,27 +229,35 @@ namespace DonorStatement
 
         public void CreateDoc(DataTable table)
         {
-            if(m_word == null)
-                m_word = new Word.Application();
-
+            m_word ??= new Word.Application(); // only creates new if m_word is null
             if (table.Rows.Count == 0)
                 return;  // should never happen
 
             // Get name, in case one is empty, make them both equal
             // if both empty give up
-            string customerName = table.Rows[0]["Name Contact"].ToString();
-            string nameLastFirst = table.Rows[0]["Name"].ToString();
-
-            if (string.IsNullOrWhiteSpace(customerName))
-                customerName = nameLastFirst;
-            if (string.IsNullOrWhiteSpace(customerName))
+            string nameLastFirst = table.Rows[0]["Customer name"].ToString();
+            if (string.IsNullOrWhiteSpace(nameLastFirst))
                 return;  // should never happen
+            RemoveDeletedFromString(ref nameLastFirst);
 
-            if (string.IsNullOrEmpty(nameLastFirst))
-                nameLastFirst = customerName;
+            string customerName = nameLastFirst;
+
+            //split "last, first" into customer name
+            string first = "";
+            string last = "";
+            int commaPos = nameLastFirst.IndexOf(',');
+            if (commaPos > 0)
+            {
+                first = nameLastFirst.Substring(commaPos + 1);
+                first = first.Trim();
+                last = nameLastFirst.Substring(0, commaPos);
+                last = last.Trim();
+                last = last.Trim('_');
+                customerName = string.Format("{0} {1}", first, last);
+            }
 
             // If the first row does not have an item, skip because it is probably a time stamp
-            if (string.IsNullOrWhiteSpace(table.Rows[0]["Item"].ToString()))
+            if (string.IsNullOrWhiteSpace(table.Rows[0]["Name"].ToString()))
             {
                 m_logger("Skipping user: " + customerName + " because Item column is empty");
                 return;
@@ -246,28 +272,26 @@ namespace DonorStatement
             catch (System.Runtime.InteropServices.COMException)
             {
                 // user probably closed Word, create a new instance
-                m_word = new Word.Application();
-                m_word.Visible = true;
+                m_word = new Word.Application
+                {
+                    Visible = true
+                };
             }
             object oTemplate = FormMain.Config.WordTemplateFileName;
             oDoc = m_word.Documents.Add(ref oTemplate, ref m_oMissing,
                 ref m_oMissing, ref m_oMissing);
 
             // create replacement values for the bookmarks
-            List<KeyValuePair<string, string>> bookMarks = new List<KeyValuePair<string, string>>();
+            List<KeyValuePair<string, string>> bookMarks = [];
             bookMarks.Add(new KeyValuePair<string, string>("Name", customerName));
             string date = DateTime.Now.ToString("M") + ", " + DateTime.Now.ToString("yyyy");
             bookMarks.Add(new KeyValuePair<string, string>("StatementDate", date));
 
-            StringBuilder builderToAddress = new StringBuilder();
+            StringBuilder builderToAddress = new();
             builderToAddress.AppendLine(customerName);
-            builderToAddress.AppendLine(table.Rows[0]["Name Street1"].ToString());
-            string street2 = table.Rows[0]["Name Street2"].ToString();
+            builderToAddress.AppendLine(table.Rows[0]["Billing Address"].ToString());
             bool bSkippedLine = false;
-            if (string.IsNullOrWhiteSpace(street2))
-                bSkippedLine = true;
-
-            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[0]["Name City"].ToString(), table.Rows[0]["Name State"].ToString(), table.Rows[0]["Name Zip"].ToString());
+            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[0]["Billing city"].ToString(), table.Rows[0]["Billing state"].ToString(), table.Rows[0]["Billing ZIP code"].ToString());
             if (bSkippedLine)
                 builderToAddress.AppendLine();
 
@@ -281,21 +305,26 @@ namespace DonorStatement
             //table of payments
             decimal totalDoations = 0;
             decimal total = 0;
-            List<PaymentItem> payments = new List<PaymentItem>();
+            List<PaymentItem> payments = [];
             foreach (DataRow row in table.Rows)
             {
-                PaymentItem payment = new PaymentItem();
-                string item = row["Item"].ToString();
+                PaymentItem payment = new();
+                string item = row["Name"].ToString();
+                if (item == "--")
+                    continue;
+                if (string.IsNullOrWhiteSpace(item))
+                    continue;
+
+                RemoveDeletedFromString(ref item);
                 // Binary search returns  0 based index of find, negative number if not found
                 if (FormMain.Config.ItemListSelected.BinarySearch(item) >= 0)
                     payment.IsDonation = true;
 
                 payment.Fields.Add(row["Date"].ToString());
                 payment.Fields.Add(item);
-                payment.Fields.Add(row["Memo"].ToString());
-                string paid = row["Paid Amount"].ToString();
-                decimal thisAmount = 0;
-                if (decimal.TryParse(paid, out thisAmount))
+                payment.Fields.Add(row["Description"].ToString());
+                string paid = row["Amount line"].ToString();
+                if (decimal.TryParse(paid, NumberStyles.Currency, CultureInfo.CurrentCulture, out decimal thisAmount))
                 {
                     total += thisAmount;
                     if (payment.IsDonation)
@@ -315,12 +344,26 @@ namespace DonorStatement
                 oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
                 return;
             }
-            string email = table.Rows[0]["Name E-Mail"].ToString();
+            string email = table.Rows[0]["Email address"].ToString();
+            if (email == "--")
+                email = string.Empty;
+
+            // check for second email address and include it in semicolon separated list
+            int idxEmail2 = table.Columns.IndexOf("Email2");
+            int idx2 = table.Columns.IndexOf("entity_column_customer_udcf_9");  // weired column name in report
+            string email2 = string.Empty;
+            if (idx2 >= 0)
+                email2 =  table.Rows[0][idx2].ToString();
+            else if (idxEmail2 >= 0)
+                email2 = table.Rows[0][idxEmail2].ToString();
+            if (!string.IsNullOrEmpty(email2) && email2 != "--")
+                email += "; " + email2;
 
             // create filename replacing certain characters
             string fileName = nameLastFirst;
             fileName = fileName.Replace(',', '.');
             fileName = fileName.Replace('&', '-');
+            fileName = fileName.Replace('/', '-');
             fileName = fileName.Replace('\'', '_');
             fileName = fileName.Replace(" ", string.Empty);
             fileName += ".pdf";
@@ -331,11 +374,18 @@ namespace DonorStatement
 
             CreatePdfFile(bookMarks, payments, oDoc, fileName);
 
-            DonorRecord donorRecord = new DonorRecord(customerName, fileName, email, nameLastFirst);
+            DonorRecord donorRecord = new(customerName, fileName, email, nameLastFirst);
             m_Files.Add(donorRecord);
             m_word.Visible = false;
         } // end CreateDoc
 
+        private void RemoveDeletedFromString(ref string item)
+        {
+            const string strDeleted = " (deleted)";
+            if (item.EndsWith(strDeleted))
+                item = item.Substring(0, item.LastIndexOf(strDeleted));
+            return;
+        }
 
         /// <summary>
         /// Creates the PDF document for a given record
@@ -382,8 +432,7 @@ namespace DonorStatement
         /// <returns></returns>
         private bool UpdateTable(Word.Document oDoc, string tableName, List<PaymentItem> rows, bool isDonation)
         {
-            Word.Table table;
-            if (!FindTable(tableName, oDoc, out table))
+            if (!FindTable(tableName, oDoc, out Word.Table table))
             {
                 m_logger("Unable to find table to update: " + tableName);
                 return false;
@@ -401,8 +450,10 @@ namespace DonorStatement
             if (!bAddedRow)
             {
                 // Add a comment to the table about no payments
-                PaymentItem item = new PaymentItem();
-                item.IsDonation = isDonation;
+                PaymentItem item = new()
+                {
+                    IsDonation = isDonation
+                };
                 item.Fields.Add(string.Empty);
                 if (isDonation)
                     item.Fields.Add("No Donations");
@@ -504,12 +555,10 @@ namespace DonorStatement
             string fileName = Path.Combine(FormMain.Config.OutputDirectory, "1FileList.csv");
             try
             {
-                using (StreamWriter file = new StreamWriter(fileName))
-                {
-                    file.WriteLine("NameLastFirst, Name,FileName, Email");
-                    foreach (var item in m_Files)
-                        file.WriteLine(string.Format("\"{0}\",\"{1}\",\"{2}\",\"{3}\"", item.NameLastFirst, item.Name, item.FileName, item.Email));
-                }
+                using StreamWriter file = new(fileName);
+                file.WriteLine("NameLastFirst, Name,FileName, Email");
+                foreach (var item in m_Files)
+                    file.WriteLine(string.Format("\"{0}\",\"{1}\",\"{2}\",\"{3}\"", item.NameLastFirst, item.Name, item.FileName, item.Email));
             }
             catch (Exception ex)
             {
@@ -521,8 +570,7 @@ namespace DonorStatement
         {
             try
             {
-                if (m_word != null)
-                    m_word.Quit();
+                m_word?.Quit();
             }
             catch (Exception)
             {

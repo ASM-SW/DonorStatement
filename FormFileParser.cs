@@ -8,7 +8,7 @@ namespace DonorStatement
 {
     public partial class FormFileParser : Form
     {
-        FileParser m_parser;
+        readonly FileParser m_parser;
         public FormFileParser(ref FileParser parser)
         {
             m_parser = parser;
@@ -54,7 +54,7 @@ namespace DonorStatement
             }
 
             // remove any items from ItemListNotSelected that is not in itemListFromFile
-            List<int> indexItemsToRemove = new List<int>();
+            List<int> indexItemsToRemove = [];
             for (int i = 0; i < FormMain.Config.ItemListNotSelected.Count; i++)
             {
                 if (itemListFromFile.BinarySearch(FormMain.Config.ItemListNotSelected[i]) < 0)
