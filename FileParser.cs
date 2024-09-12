@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.FileIO;
 using System.Data;
+using System.Xml.Serialization;
 
 namespace DonorStatement
 {
@@ -45,15 +46,33 @@ namespace DonorStatement
                 using TextFieldParser csvReader = new(FormMain.Config.InputFileName);
                 csvReader.SetDelimiters([","]);
                 csvReader.HasFieldsEnclosedInQuotes = true;
-                string[] colFields = csvReader.ReadFields();
-                foreach (string item in colFields)
+
+                // get column headers
+                while (!csvReader.EndOfData)
                 {
-                    DataColumn column = new(item);
-                    m_dataTable.Columns.Add(column);
+                    string[] colFields = csvReader.ReadFields();
+                    if(!colFields.Contains("Customer"))
+                    {
+                        m_logger("Skipping header line: starting with: " + colFields[0]);
+                        continue;
+                    }
+                    foreach (string item in colFields)
+                    {
+                        DataColumn column = new(item);
+                        m_dataTable.Columns.Add(column);
+                    }
+                    break;
                 }
+                // read data
                 while (!csvReader.EndOfData)
                 {
                     string[] fieldData = csvReader.ReadFields();
+                    if (string.IsNullOrEmpty(fieldData[1]))
+                    {
+                        // the footer has data in only the first field.
+                        m_logger("skipping line with not enough columns: " + fieldData[0]);
+                        continue;
+                    }
                     m_dataTable.Rows.Add(fieldData);
                 }
             }
@@ -94,18 +113,18 @@ namespace DonorStatement
 
         public void GetItemList(out List<string> items)
         {
-            GetColumnContentsUnique("Name", out items);  // was Item
+            GetColumnContentsUnique("Product/Service", out items);  // was Item
         }
 
         public void GetNameList(out List<string> names)
         {
-            GetColumnContentsUnique("Customer name", out names);  // was Name
+            GetColumnContentsUnique("Customer", out names);  // was Name
         }
 
         public void GetDataForName(string name, out DataTable table)
         {
             // need to duplicate the single quote in a name  "O'Donald" -> "O''Donald"
-            string filter = string.Format("[Customer name] = '{0}'", name.Replace("'", "''")); 
+            string filter = string.Format("[Customer] = '{0}'", name.Replace("'", "''")); 
             DataRow[] rows = m_dataTable.Select(filter, "Date ASC");
 
             table = m_dataTable.Clone();

@@ -83,14 +83,14 @@ namespace DonorStatement
         private static readonly List<string> m_requiredColumnNames =
         [
             "Date",
-            "Name",       // name of purchase
+            "Product/Service",       // name of purchase
             "Billing city",
-            "Customer name",   // last, first
+            "Customer",   // last, first
             "Email address",
             "Billing state",
             "Billing address",
             "Billing ZIP code",
-            "Amount line"          // has $ and commas
+            "Amount"          // has $ and commas
         ];
 
         private static readonly List<string> m_requiredBookmarkNames =
@@ -235,7 +235,7 @@ namespace DonorStatement
 
             // Get name, in case one is empty, make them both equal
             // if both empty give up
-            string nameLastFirst = table.Rows[0]["Customer name"].ToString();
+            string nameLastFirst = table.Rows[0]["Customer"].ToString();
             if (string.IsNullOrWhiteSpace(nameLastFirst))
                 return;  // should never happen
             RemoveDeletedFromString(ref nameLastFirst);
@@ -257,7 +257,7 @@ namespace DonorStatement
             }
 
             // If the first row does not have an item, skip because it is probably a time stamp
-            if (string.IsNullOrWhiteSpace(table.Rows[0]["Name"].ToString()))
+            if (string.IsNullOrWhiteSpace(table.Rows[0]["Product/Service"].ToString()))
             {
                 m_logger("Skipping user: " + customerName + " because Item column is empty");
                 return;
@@ -309,7 +309,7 @@ namespace DonorStatement
             foreach (DataRow row in table.Rows)
             {
                 PaymentItem payment = new();
-                string item = row["Name"].ToString();
+                string item = row["Product/Service"].ToString();
                 if (item == "--")
                     continue;
                 if (string.IsNullOrWhiteSpace(item))
@@ -322,8 +322,11 @@ namespace DonorStatement
 
                 payment.Fields.Add(row["Date"].ToString());
                 payment.Fields.Add(item);
-                payment.Fields.Add(row["Description"].ToString());
-                string paid = row["Amount line"].ToString();
+                string description = row["Description"].ToString();
+                if (description == "--")
+                    description = string.Empty;
+                payment.Fields.Add(description);
+                string paid = row["Amount"].ToString();
                 if (decimal.TryParse(paid, NumberStyles.Currency, CultureInfo.CurrentCulture, out decimal thisAmount))
                 {
                     total += thisAmount;
