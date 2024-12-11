@@ -43,7 +43,7 @@ namespace DonorStatement
             return false;
         }
 
-        private void butInputFile_Click(object sender, EventArgs e)
+        private void ButInputFile_Click(object sender, EventArgs e)
         {
             string fileName = textInputFile.Text;
             if (SelectFile(ref fileName, "Comma separated file|*.csv|All Files|*.*"))
@@ -53,7 +53,7 @@ namespace DonorStatement
             }
         }
 
-        private void butWordTemplate_Click(object sender, EventArgs e)
+        private void ButWordTemplate_Click(object sender, EventArgs e)
         {
             string fileName = textWordTemplate.Text;
             if (SelectFile(ref fileName, "Word templated file|*.dotx|All Files|*.*"))
@@ -63,7 +63,7 @@ namespace DonorStatement
             }
         }
 
-        private void butOutputFolder_Click(object sender, EventArgs e)
+        private void ButOutputFolder_Click(object sender, EventArgs e)
         {
             string folderName = textOutputDirectory.Text;
             folderBrowserDialog1.SelectedPath = folderName;
@@ -75,7 +75,7 @@ namespace DonorStatement
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void TextBox1_TextChanged(object sender, EventArgs e)
         {
             FormMain.Config.DateRange = textDateRange.Text;
         }
@@ -96,7 +96,7 @@ namespace DonorStatement
         public bool CanExit(out string errorMsg)
         {
             bool res = true;
-            StringBuilder msg = new StringBuilder("Errors in Configuration: \n");
+            StringBuilder msg = new("Errors in Configuration: \n");
 
             
             FormMain.Config.InputFileName = textInputFile.Text;
@@ -128,7 +128,7 @@ namespace DonorStatement
             return res;
         }
 
-        private void cbReportOtherPayments_CheckedChanged(object sender, EventArgs e)
+        private void CbReportOtherPayments_CheckedChanged(object sender, EventArgs e)
         {
             FormMain.Config.ReportOtherPayments = cbReportOtherPayments.Checked;
         }

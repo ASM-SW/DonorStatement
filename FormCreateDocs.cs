@@ -32,6 +32,8 @@ namespace DonorStatement
 
         private void StartButton_Click(object sender, EventArgs e)
         {
+            ConfigurationDYES Config = FormMain.Config;
+            Config.Serialize(Config.ConfigFileName);
             buttonReloadFile.Enabled = false;
             buttonStart.Enabled = false;
             buttonStop.Enabled = true;

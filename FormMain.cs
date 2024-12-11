@@ -18,10 +18,10 @@ namespace DonorStatement
             backward
         }
 
-        private List<Form> m_forms = new List<Form>();
+        readonly private List<Form> m_forms = [];
         LogMessageDelegate m_loggerDelegate;
 
-        private UInt32 LogMaxLines = 250;
+        readonly private UInt32 LogMaxLines = 250;
         DocumentCreator m_docCreator;
         FileParser m_parser;
         int m_activeForm = -1;
@@ -31,8 +31,9 @@ namespace DonorStatement
         public FormMain()
         {
             m_loggerDelegate = LogMessage;
-            ConfigurationDYES cfg = new ConfigurationDYES();
-            ConfigurationDYES.DeSerialize(cfg.ConfigFileName, ref cfg);
+            ConfigurationDYES cfg = new();
+            if (!ConfigurationDYES.DeSerialize(cfg.ConfigFileName, ref cfg))
+                Environment.Exit(-1);
             Config = cfg;
             m_docCreator = new DocumentCreator(m_loggerDelegate);
             m_parser = new FileParser(m_loggerDelegate);
@@ -77,10 +78,9 @@ namespace DonorStatement
 
         private bool SubFormOkToExit()
         {
-            if (m_forms[m_activeForm] is ISubForm)
+            if (m_forms[m_activeForm] is ISubForm form)
             {
-                string errorMsg;
-                if (((ISubForm)m_forms[m_activeForm]).CanExit(out errorMsg))
+                if (form.CanExit(out string errorMsg))
                     return true;
 
                 MessageBox.Show(errorMsg);
@@ -151,7 +151,7 @@ namespace DonorStatement
         {
             if (lbLogging.InvokeRequired)
             {
-                LogMessageDelegate update = new LogMessageDelegate(LogMessage);
+                LogMessageDelegate update = new(LogMessage);
                 lbLogging.Invoke(update, msg);
             }
             else
@@ -169,13 +169,13 @@ namespace DonorStatement
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void ContextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             switch (e.ClickedItem.Text)
             {
                 case "&Copy":
                     {
-                        StringBuilder str = new StringBuilder();
+                        StringBuilder str = new();
                         if (lbLogging.SelectedItems.Count == 0)
                             break;
                         foreach (var item in lbLogging.SelectedItems)
@@ -202,24 +202,24 @@ namespace DonorStatement
             Config.Serialize(Config.ConfigFileName);
         }
 
-        private void butNext_Click(object sender, EventArgs e)
+        private void ButNext_Click(object sender, EventArgs e)
         {
             SwitchPanelForm(PanelNavDirection.forward);
         }
 
-        private void butBack_Click(object sender, EventArgs e)
+        private void ButBack_Click(object sender, EventArgs e)
         {
             SwitchPanelForm(PanelNavDirection.backward);
 
         }
 
-        private void buttonAbout_Click(object sender, EventArgs e)
+        private void ButtonAbout_Click(object sender, EventArgs e)
         {
-            AboutBox1 aboutBox = new AboutBox1(this);
+            AboutBox1 aboutBox = new(this);
             aboutBox.ShowDialog();
         }
 
-        private void buttonHelp_Click(object sender, EventArgs e)
+        private void ButtonHelp_Click(object sender, EventArgs e)
         {
             string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DonorStatement.pdf");
             try

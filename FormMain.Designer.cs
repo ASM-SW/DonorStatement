@@ -75,7 +75,7 @@ namespace DonorStatement
             this.selectAllToolStripMenuItem1});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(123, 70);
-            this.contextMenuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.contextMenuStrip1_ItemClicked);
+            this.contextMenuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.ContextMenuStrip1_ItemClicked);
             // 
             // clearToolStripMenuItem
             // 
@@ -112,7 +112,7 @@ namespace DonorStatement
             this.butNext.TabIndex = 5;
             this.butNext.Text = "Next";
             this.butNext.UseVisualStyleBackColor = true;
-            this.butNext.Click += new System.EventHandler(this.butNext_Click);
+            this.butNext.Click += new System.EventHandler(this.ButNext_Click);
             // 
             // butBack
             // 
@@ -122,7 +122,7 @@ namespace DonorStatement
             this.butBack.TabIndex = 6;
             this.butBack.Text = "Back";
             this.butBack.UseVisualStyleBackColor = true;
-            this.butBack.Click += new System.EventHandler(this.butBack_Click);
+            this.butBack.Click += new System.EventHandler(this.ButBack_Click);
             // 
             // labelProgress
             // 
@@ -151,7 +151,7 @@ namespace DonorStatement
             this.buttonAbout.TabIndex = 10;
             this.buttonAbout.Text = "About";
             this.buttonAbout.UseVisualStyleBackColor = true;
-            this.buttonAbout.Click += new System.EventHandler(this.buttonAbout_Click);
+            this.buttonAbout.Click += new System.EventHandler(this.ButtonAbout_Click);
             // 
             // buttonHelp
             // 
@@ -161,7 +161,7 @@ namespace DonorStatement
             this.buttonHelp.TabIndex = 11;
             this.buttonHelp.Text = "Help";
             this.buttonHelp.UseVisualStyleBackColor = true;
-            this.buttonHelp.Click += new System.EventHandler(this.buttonHelp_Click);
+            this.buttonHelp.Click += new System.EventHandler(this.ButtonHelp_Click);
             // 
             // label1
             // 

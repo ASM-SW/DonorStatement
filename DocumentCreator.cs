@@ -65,15 +65,15 @@ namespace DonorStatement
         --- ---------------  ---------------- ---------------------------------------
         X   Date             Date   
         x   Item             Name             new product servcie does not have the  xxxx:
-        X   Memo             Description    
+        X   Memo             Memo/Description    
         X   Name             Customer name    last name, first names
         x   Name City        Billing city   
         X   Name Contact                      first last,  no commas
-        x   Name E-Mail      Email address
+        x   Name E-Mail      Email
         x   Name State       Billing state  
-        x   Name Street1     Billing address  billing address may include multiple lines separate by ctrl chars
+        x   Name Street1     Billing street  Billing street may include multiple lines separate by ctrl chars
         x   Name Street2        
-        x   Name Zip         Billing ZIP code   
+        x   Name Zip         Billing zip code   
         x   Paid Amount      Amount line   new has $ and commas
             Account          Account name     old had # + name, new just name
             Name Phone #        
@@ -86,10 +86,10 @@ namespace DonorStatement
             "Product/Service",       // name of purchase
             "Billing city",
             "Customer",   // last, first
-            "Email address",
+            "Email",
             "Billing state",
-            "Billing address",
-            "Billing ZIP code",
+            "Billing street",
+            "Billing zip code",
             "Amount"          // has $ and commas
         ];
 
@@ -256,13 +256,6 @@ namespace DonorStatement
                 customerName = string.Format("{0} {1}", first, last);
             }
 
-            // If the first row does not have an item, skip because it is probably a time stamp
-            if (string.IsNullOrWhiteSpace(table.Rows[0]["Product/Service"].ToString()))
-            {
-                m_logger("Skipping user: " + customerName + " because Item column is empty");
-                return;
-            }
-
             //create a new document.
             Word.Document oDoc;
             try
@@ -287,11 +280,13 @@ namespace DonorStatement
             string date = DateTime.Now.ToString("M") + ", " + DateTime.Now.ToString("yyyy");
             bookMarks.Add(new KeyValuePair<string, string>("StatementDate", date));
 
+            // use the last row for the address, in case there was a change
+            int ndxLast = table.Rows.Count - 1;
             StringBuilder builderToAddress = new();
             builderToAddress.AppendLine(customerName);
-            builderToAddress.AppendLine(table.Rows[0]["Billing Address"].ToString());
+            builderToAddress.AppendLine(table.Rows[ndxLast]["Billing street"].ToString());
             bool bSkippedLine = false;
-            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[0]["Billing city"].ToString(), table.Rows[0]["Billing state"].ToString(), table.Rows[0]["Billing ZIP code"].ToString());
+            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[ndxLast]["Billing city"].ToString(), table.Rows[ndxLast]["Billing state"].ToString(), table.Rows[ndxLast]["Billing zip code"].ToString());
             if (bSkippedLine)
                 builderToAddress.AppendLine();
 
@@ -315,14 +310,14 @@ namespace DonorStatement
                 if (string.IsNullOrWhiteSpace(item))
                     continue;
 
-                RemoveDeletedFromString(ref item);
                 // Binary search returns  0 based index of find, negative number if not found
                 if (FormMain.Config.ItemListSelected.BinarySearch(item) >= 0)
                     payment.IsDonation = true;
+                RemoveDeletedFromString(ref item);
 
                 payment.Fields.Add(row["Date"].ToString());
                 payment.Fields.Add(item);
-                string description = row["Description"].ToString();
+                string description = row["Memo/Description"].ToString();
                 if (description == "--")
                     description = string.Empty;
                 payment.Fields.Add(description);
@@ -347,11 +342,11 @@ namespace DonorStatement
                 oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
                 return;
             }
-            string email = table.Rows[0]["Email address"].ToString();
+            string email = table.Rows[0]["Email"].ToString();
             if (email == "--")
                 email = string.Empty;
 
-            // check for second email address and include it in semicolon separated list
+            // check for second Email and include it in semicolon separated list
             int idxEmail2 = table.Columns.IndexOf("Email2");
             int idx2 = table.Columns.IndexOf("entity_column_customer_udcf_9");  // weired column name in report
             string email2 = string.Empty;

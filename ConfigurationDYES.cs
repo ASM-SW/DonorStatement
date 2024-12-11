@@ -34,9 +34,9 @@ namespace DonorStatement
 
         public ConfigurationDYES()
         {
-            ItemListSelected = new List<string>();
-            ItemListNotSelected = new List<string>();
-            ItemListIgnore = new List<string>();
+            ItemListSelected = [];
+            ItemListNotSelected = [];
+            ItemListIgnore = [];
             OutputFileListFileName = "1FileList.csv";
             ReportOtherPayments = false;
 
@@ -52,11 +52,9 @@ namespace DonorStatement
         {
             try
             {
-                using (TextWriter writer = new StreamWriter(fileName))
-                {
-                    XmlSerializer ser = new XmlSerializer(typeof(ConfigurationDYES));
-                    ser.Serialize(writer, this);
-                }
+                using TextWriter writer = new StreamWriter(fileName);
+                XmlSerializer ser = new(typeof(ConfigurationDYES));
+                ser.Serialize(writer, this);
             }
             catch (Exception ex)
             {
@@ -71,9 +69,9 @@ namespace DonorStatement
                 return true;
             try
             {
-                using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
+                using (FileStream fileStream = new(fileName, FileMode.Open))
                 {
-                    XmlSerializer ser = new XmlSerializer(typeof(ConfigurationDYES));
+                    XmlSerializer ser = new(typeof(ConfigurationDYES));
                     cfg = (ConfigurationDYES)ser.Deserialize(fileStream);
                 }
                 cfg.ItemListSelected.Sort();
@@ -81,7 +79,9 @@ namespace DonorStatement
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                string msg = string.Format("Unable to read config file:  {0}\n\n{1}", fileName, ex.ToString());
+                MessageBox.Show(msg, "ERROR", MessageBoxButtons.OK);
+                return false;
             }
             return true;
         }
