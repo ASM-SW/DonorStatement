@@ -50,7 +50,7 @@ namespace DonorStatement
                 m_parser.ParseInputFile();
 
             m_parser.GetColumnNames(out List<string> columnNames);
-            if (!m_docCreator.CheckForColumns(ref columnNames))
+            if (!DocumentCreator.CheckForColumns(ref columnNames))
             {
                 m_docCreator.CreateDocsDone();
                 return;

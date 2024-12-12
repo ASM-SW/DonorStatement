@@ -12,7 +12,6 @@ using Word = Microsoft.Office.Interop.Word;
 
 namespace DonorStatement
 {
-
     /// <summary>
     /// Class to contain one donor.  This is put into a list and searialized out to a csv file in DoucmentCreator.SaveFilesList().
     /// </summary>
@@ -122,7 +121,6 @@ namespace DonorStatement
             {
                 if (Directory.Exists(FormMain.Config.OutputDirectory))
                 {
-                    // IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon);
                     DialogResult res = MessageBox.Show("Output directory: " + FormMain.Config.OutputDirectory + " exists, is it OK to delete it and continue?", 
                         "Continue", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                     if (res == DialogResult.Cancel)
@@ -154,7 +152,7 @@ namespace DonorStatement
             }
         }
 
-        public bool CheckForColumns(ref List<string> columnNames)
+        public static bool CheckForColumns(ref List<string> columnNames)
         {
             StringBuilder msg = new("ERROR - CSV input file is missing the following columns: ");
             int cnt = 0;
@@ -248,9 +246,9 @@ namespace DonorStatement
             int commaPos = nameLastFirst.IndexOf(',');
             if (commaPos > 0)
             {
-                first = nameLastFirst.Substring(commaPos + 1);
+                first = nameLastFirst[(commaPos + 1)..];
                 first = first.Trim();
-                last = nameLastFirst.Substring(0, commaPos);
+                last = nameLastFirst[..commaPos];
                 last = last.Trim();
                 last = last.Trim('_');
                 customerName = string.Format("{0} {1}", first, last);
@@ -377,11 +375,11 @@ namespace DonorStatement
             m_word.Visible = false;
         } // end CreateDoc
 
-        private void RemoveDeletedFromString(ref string item)
+        private static void RemoveDeletedFromString(ref string item)
         {
             const string strDeleted = " (deleted)";
             if (item.EndsWith(strDeleted))
-                item = item.Substring(0, item.LastIndexOf(strDeleted));
+                item = item[..item.LastIndexOf(strDeleted)];
             return;
         }
 
@@ -469,7 +467,7 @@ namespace DonorStatement
         /// </summary>
         /// <param name="values">list of values used to create the row in the table</param>
         /// <param name="table">the table to modify</param>
-        private void AppendRowToTable(List<string> values, ref Word.Table table)
+        private static void AppendRowToTable(List<string> values, ref Word.Table table)
         {
             Word.Row row = table.Rows.Add(System.Reflection.Missing.Value);
             int i = 0;
@@ -498,7 +496,7 @@ namespace DonorStatement
             return false;
         }
 
-        private bool FindBookMark(string bookMarkName, Word.Document oDoc, ref Word.Bookmark bookMark)
+        private static bool FindBookMark(string bookMarkName, Word.Document oDoc, ref Word.Bookmark bookMark)
         {
             bookMark = null;
 
@@ -513,7 +511,7 @@ namespace DonorStatement
             return false;
         }
 
-        private bool FindTable(string tableAltText, Word.Document oDoc, out Word.Table table)
+        private static bool FindTable(string tableAltText, Word.Document oDoc, out Word.Table table)
         {
             table = null;
             foreach (Word.Table item in oDoc.Tables)
