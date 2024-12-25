@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DonorStatement", "DonorStatement.csproj", "{99A7E63E-3D8F-4B16-8BB9-D429159CD0C3}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Installer.wixproj", "{71FA1A66-9CF0-494D-92CC-A2D497A754F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageBoxCenteredDll", "..\MessageBoxCenteredDll\MessageBoxCenteredDll.csproj", "{255C784C-0F5B-4D91-9F6A-43D36E732452}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{71FA1A66-9CF0-494D-92CC-A2D497A754F1}.Release|Any CPU.Build.0 = Release|x86
 		{71FA1A66-9CF0-494D-92CC-A2D497A754F1}.Release|x86.ActiveCfg = Release|x86
 		{71FA1A66-9CF0-494D-92CC-A2D497A754F1}.Release|x86.Build.0 = Release|x86
+		{255C784C-0F5B-4D91-9F6A-43D36E732452}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{255C784C-0F5B-4D91-9F6A-43D36E732452}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{255C784C-0F5B-4D91-9F6A-43D36E732452}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{255C784C-0F5B-4D91-9F6A-43D36E732452}.Debug|x86.Build.0 = Debug|Any CPU
+		{255C784C-0F5B-4D91-9F6A-43D36E732452}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{255C784C-0F5B-4D91-9F6A-43D36E732452}.Release|Any CPU.Build.0 = Release|Any CPU
+		{255C784C-0F5B-4D91-9F6A-43D36E732452}.Release|x86.ActiveCfg = Release|Any CPU
+		{255C784C-0F5B-4D91-9F6A-43D36E732452}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

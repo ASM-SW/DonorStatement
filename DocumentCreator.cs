@@ -1,9 +1,9 @@
-﻿// Copyright © 2016-2023  ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2016-2024 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
+using MessageBoxCenteredDll;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -46,7 +46,7 @@ namespace DonorStatement
         public List<string> Fields { get; set; }
         public bool IsDonation { get; set; }
     }
-    
+
     // this class handles creating, updating and saving the document
     public class DocumentCreator
     {
@@ -108,26 +108,26 @@ namespace DonorStatement
             m_logger = logger;
         }
 
-        public void CreateDoc()
+        public bool CreateDoc()
         {
             if (string.IsNullOrWhiteSpace(FormMain.Config.OutputDirectory))
             {
                 string msg = "Output directory is empty, cannot continue";
-                MessageBox.Show(msg);
+                FormMain.MessageBoxError(msg);
                 m_logger(msg);
-                return;
+                return false;
             }
             try
             {
                 if (Directory.Exists(FormMain.Config.OutputDirectory))
                 {
-                    DialogResult res = MessageBox.Show("Output directory: " + FormMain.Config.OutputDirectory + " exists, is it OK to delete it and continue?", 
-                        "Continue", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                    if (res == DialogResult.Cancel)
+                    MessageBoxCentered.ButtonTyp res = FormMain.MessageBoxEx("Information",
+                        string.Concat("Output directory exists: ", FormMain.Config.OutputDirectory), MessageBoxCentered.BoxType.OkCancel);
+                    if (res == MessageBoxCentered.ButtonTyp.Cancel)
                     {
                         m_logger("Output directory exists: " + FormMain.Config.OutputDirectory);
                         m_logger("User selected to cancel");
-                        return;
+                        return false;
                     }
                     Directory.Delete(FormMain.Config.OutputDirectory, true);
                     System.Threading.Thread.Sleep(1000);
@@ -138,9 +138,9 @@ namespace DonorStatement
             catch (Exception ex)
             {
                 m_logger("Error: " + ex);
-                return;
+                return false;
             }
-
+            return true;
         }
 
         public void CreateDocsDone()
@@ -154,7 +154,7 @@ namespace DonorStatement
 
         public static bool CheckForColumns(ref List<string> columnNames)
         {
-            StringBuilder msg = new("ERROR - CSV input file is missing the following columns: ");
+            StringBuilder msg = new("CSV input file is missing the following columns: ");
             int cnt = 0;
             foreach (string name in m_requiredColumnNames)
             {
@@ -167,7 +167,7 @@ namespace DonorStatement
             }
             if (cnt > 0)
             {
-                MessageBox.Show(msg.ToString());
+                FormMain.MessageBoxError(msg.ToString());
                 return false;
             }
             return true;
@@ -196,7 +196,7 @@ namespace DonorStatement
             }
             if (cnt > 0)
             {
-                MessageBox.Show(msg.ToString());
+                FormMain.MessageBox(msg.ToString());
                 result = false;
             }
 
@@ -217,7 +217,7 @@ namespace DonorStatement
                 }
             if (cnt > 0)
             {
-                MessageBox.Show(msg.ToString());
+                FormMain.MessageBox(msg.ToString());
                 result = false;
             }
 
@@ -349,7 +349,7 @@ namespace DonorStatement
             int idx2 = table.Columns.IndexOf("entity_column_customer_udcf_9");  // weired column name in report
             string email2 = string.Empty;
             if (idx2 >= 0)
-                email2 =  table.Rows[0][idx2].ToString();
+                email2 = table.Rows[0][idx2].ToString();
             else if (idxEmail2 >= 0)
                 email2 = table.Rows[0][idxEmail2].ToString();
             if (!string.IsNullOrEmpty(email2) && email2 != "--")
@@ -457,7 +457,7 @@ namespace DonorStatement
                     item.Fields.Add("No Other Payments");
                 AppendRowToTable(item.Fields, ref table);
             }
-                
+
 
             return true;
         }
@@ -558,7 +558,7 @@ namespace DonorStatement
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving file: " + fileName + "\n" + ex.Message);
+                FormMain.MessageBoxError("Error saving file: " + fileName + "\n" + ex.Message);
             }
         }
 

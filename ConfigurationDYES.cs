@@ -1,18 +1,12 @@
-﻿// Copyright © 2016-2018  ASM-SW
-// asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2016-2024 ASM-SW
+// asm-sw@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Xml.Serialization;
 
 namespace DonorStatement
 {
- 
-
     /// <summary>
     /// ConfigurationDYES class contains all of the configuration information for generating the donor reports.  
     /// It may be saved and read in from file between runs.
@@ -58,7 +52,7 @@ namespace DonorStatement
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.ToString());
+                FormMain.MessageBoxError(ex.ToString());
             }
             return true;
         }
@@ -80,7 +74,7 @@ namespace DonorStatement
             catch (Exception ex)
             {
                 string msg = string.Format("Unable to read config file:  {0}\n\n{1}", fileName, ex.ToString());
-                MessageBox.Show(msg, "ERROR", MessageBoxButtons.OK);
+                FormMain.MessageBoxError(msg);
                 return false;
             }
             return true;

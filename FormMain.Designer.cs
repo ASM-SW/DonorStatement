@@ -1,5 +1,5 @@
-﻿// Copyright © 2016  ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2016-2024 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
 using System;
 
 namespace DonorStatement
@@ -35,166 +35,186 @@ namespace DonorStatement
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            this.lbLogging = new System.Windows.Forms.ListBox();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.copyToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.butNext = new System.Windows.Forms.Button();
-            this.butBack = new System.Windows.Forms.Button();
-            this.labelProgress = new System.Windows.Forms.Label();
-            this.labelStep = new System.Windows.Forms.Label();
-            this.buttonAbout = new System.Windows.Forms.Button();
-            this.buttonHelp = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.contextMenuStrip1.SuspendLayout();
-            this.SuspendLayout();
+            lbLogging = new System.Windows.Forms.ListBox();
+            contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(components);
+            clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            copyToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            selectAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            panel1 = new System.Windows.Forms.Panel();
+            butNext = new System.Windows.Forms.Button();
+            butBack = new System.Windows.Forms.Button();
+            labelProgress = new System.Windows.Forms.Label();
+            labelStep = new System.Windows.Forms.Label();
+            buttonAbout = new System.Windows.Forms.Button();
+            buttonHelp = new System.Windows.Forms.Button();
+            label1 = new System.Windows.Forms.Label();
+            Exit = new System.Windows.Forms.Button();
+            contextMenuStrip1.SuspendLayout();
+            SuspendLayout();
             // 
             // lbLogging
             // 
-            this.lbLogging.BackColor = System.Drawing.Color.GhostWhite;
-            this.lbLogging.ContextMenuStrip = this.contextMenuStrip1;
-            this.lbLogging.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lbLogging.FormattingEnabled = true;
-            this.lbLogging.HorizontalScrollbar = true;
-            this.lbLogging.Location = new System.Drawing.Point(0, 405);
-            this.lbLogging.Name = "lbLogging";
-            this.lbLogging.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.lbLogging.Size = new System.Drawing.Size(820, 134);
-            this.lbLogging.TabIndex = 1;
+            lbLogging.BackColor = System.Drawing.Color.GhostWhite;
+            lbLogging.ContextMenuStrip = contextMenuStrip1;
+            lbLogging.Dock = System.Windows.Forms.DockStyle.Bottom;
+            lbLogging.FormattingEnabled = true;
+            lbLogging.HorizontalScrollbar = true;
+            lbLogging.ItemHeight = 15;
+            lbLogging.Location = new System.Drawing.Point(0, 468);
+            lbLogging.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            lbLogging.Name = "lbLogging";
+            lbLogging.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            lbLogging.Size = new System.Drawing.Size(957, 154);
+            lbLogging.TabIndex = 1;
             // 
             // contextMenuStrip1
             // 
-            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.clearToolStripMenuItem,
-            this.copyToolStripMenuItem1,
-            this.selectAllToolStripMenuItem1});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 70);
-            this.contextMenuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.ContextMenuStrip1_ItemClicked);
+            contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
+            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { clearToolStripMenuItem, copyToolStripMenuItem1, selectAllToolStripMenuItem1 });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new System.Drawing.Size(123, 70);
+            contextMenuStrip1.ItemClicked += ContextMenuStrip1_ItemClicked;
             // 
             // clearToolStripMenuItem
             // 
-            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            this.clearToolStripMenuItem.Text = "C&lear";
+            clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            clearToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            clearToolStripMenuItem.Text = "C&lear";
             // 
             // copyToolStripMenuItem1
             // 
-            this.copyToolStripMenuItem1.Name = "copyToolStripMenuItem1";
-            this.copyToolStripMenuItem1.Size = new System.Drawing.Size(122, 22);
-            this.copyToolStripMenuItem1.Text = "&Copy";
+            copyToolStripMenuItem1.Name = "copyToolStripMenuItem1";
+            copyToolStripMenuItem1.Size = new System.Drawing.Size(122, 22);
+            copyToolStripMenuItem1.Text = "&Copy";
             // 
             // selectAllToolStripMenuItem1
             // 
-            this.selectAllToolStripMenuItem1.Name = "selectAllToolStripMenuItem1";
-            this.selectAllToolStripMenuItem1.Size = new System.Drawing.Size(122, 22);
-            this.selectAllToolStripMenuItem1.Text = "Select &All";
+            selectAllToolStripMenuItem1.Name = "selectAllToolStripMenuItem1";
+            selectAllToolStripMenuItem1.Size = new System.Drawing.Size(122, 22);
+            selectAllToolStripMenuItem1.Text = "Select &All";
             // 
             // panel1
             // 
-            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Location = new System.Drawing.Point(5, 117);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(809, 276);
-            this.panel1.TabIndex = 4;
+            panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            panel1.Location = new System.Drawing.Point(6, 135);
+            panel1.Margin = new System.Windows.Forms.Padding(2);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(943, 318);
+            panel1.TabIndex = 4;
             // 
             // butNext
             // 
-            this.butNext.Location = new System.Drawing.Point(108, 17);
-            this.butNext.Name = "butNext";
-            this.butNext.Size = new System.Drawing.Size(75, 23);
-            this.butNext.TabIndex = 5;
-            this.butNext.Text = "Next";
-            this.butNext.UseVisualStyleBackColor = true;
-            this.butNext.Click += new System.EventHandler(this.ButNext_Click);
+            butNext.Location = new System.Drawing.Point(126, 20);
+            butNext.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            butNext.Name = "butNext";
+            butNext.Size = new System.Drawing.Size(88, 27);
+            butNext.TabIndex = 5;
+            butNext.Text = "Next";
+            butNext.UseVisualStyleBackColor = true;
+            butNext.Click += ButNext_Click;
             // 
             // butBack
             // 
-            this.butBack.Location = new System.Drawing.Point(12, 17);
-            this.butBack.Name = "butBack";
-            this.butBack.Size = new System.Drawing.Size(75, 23);
-            this.butBack.TabIndex = 6;
-            this.butBack.Text = "Back";
-            this.butBack.UseVisualStyleBackColor = true;
-            this.butBack.Click += new System.EventHandler(this.ButBack_Click);
+            butBack.Location = new System.Drawing.Point(14, 20);
+            butBack.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            butBack.Name = "butBack";
+            butBack.Size = new System.Drawing.Size(88, 27);
+            butBack.TabIndex = 6;
+            butBack.Text = "Back";
+            butBack.UseVisualStyleBackColor = true;
+            butBack.Click += ButBack_Click;
             // 
             // labelProgress
             // 
-            this.labelProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelProgress.Location = new System.Drawing.Point(9, 55);
-            this.labelProgress.Name = "labelProgress";
-            this.labelProgress.Size = new System.Drawing.Size(133, 22);
-            this.labelProgress.TabIndex = 8;
-            this.labelProgress.Text = "Step 0 of 0";
+            labelProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            labelProgress.Location = new System.Drawing.Point(10, 63);
+            labelProgress.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            labelProgress.Name = "labelProgress";
+            labelProgress.Size = new System.Drawing.Size(155, 25);
+            labelProgress.TabIndex = 8;
+            labelProgress.Text = "Step 0 of 0";
             // 
             // labelStep
             // 
-            this.labelStep.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelStep.Location = new System.Drawing.Point(29, 97);
-            this.labelStep.Name = "labelStep";
-            this.labelStep.Size = new System.Drawing.Size(542, 18);
-            this.labelStep.TabIndex = 9;
-            this.labelStep.Text = "-";
-            this.labelStep.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            labelStep.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            labelStep.Location = new System.Drawing.Point(34, 112);
+            labelStep.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            labelStep.Name = "labelStep";
+            labelStep.Size = new System.Drawing.Size(632, 21);
+            labelStep.TabIndex = 9;
+            labelStep.Text = "-";
+            labelStep.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // buttonAbout
             // 
-            this.buttonAbout.Location = new System.Drawing.Point(501, 17);
-            this.buttonAbout.Name = "buttonAbout";
-            this.buttonAbout.Size = new System.Drawing.Size(75, 23);
-            this.buttonAbout.TabIndex = 10;
-            this.buttonAbout.Text = "About";
-            this.buttonAbout.UseVisualStyleBackColor = true;
-            this.buttonAbout.Click += new System.EventHandler(this.ButtonAbout_Click);
+            buttonAbout.Location = new System.Drawing.Point(584, 20);
+            buttonAbout.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            buttonAbout.Name = "buttonAbout";
+            buttonAbout.Size = new System.Drawing.Size(88, 27);
+            buttonAbout.TabIndex = 10;
+            buttonAbout.Text = "About";
+            buttonAbout.UseVisualStyleBackColor = true;
+            buttonAbout.Click += ButtonAbout_Click;
             // 
             // buttonHelp
             // 
-            this.buttonHelp.Location = new System.Drawing.Point(501, 65);
-            this.buttonHelp.Name = "buttonHelp";
-            this.buttonHelp.Size = new System.Drawing.Size(75, 23);
-            this.buttonHelp.TabIndex = 11;
-            this.buttonHelp.Text = "Help";
-            this.buttonHelp.UseVisualStyleBackColor = true;
-            this.buttonHelp.Click += new System.EventHandler(this.ButtonHelp_Click);
+            buttonHelp.Location = new System.Drawing.Point(584, 51);
+            buttonHelp.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            buttonHelp.Name = "buttonHelp";
+            buttonHelp.Size = new System.Drawing.Size(88, 27);
+            buttonHelp.TabIndex = 11;
+            buttonHelp.Text = "Help";
+            buttonHelp.UseVisualStyleBackColor = true;
+            buttonHelp.Click += ButtonHelp_Click;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
-            this.label1.Location = new System.Drawing.Point(9, 84);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(64, 13);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "labelVersion";
+            label1.AutoSize = true;
+            label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            label1.Location = new System.Drawing.Point(10, 97);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(64, 13);
+            label1.TabIndex = 12;
+            label1.Text = "labelVersion";
+            // 
+            // Exit
+            // 
+            Exit.Location = new System.Drawing.Point(584, 82);
+            Exit.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Exit.Name = "Exit";
+            Exit.Size = new System.Drawing.Size(88, 27);
+            Exit.TabIndex = 13;
+            Exit.Text = "Exit";
+            Exit.UseMnemonic = false;
+            Exit.UseVisualStyleBackColor = true;
+            Exit.Click += Exit_Click;
             // 
             // FormMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(820, 539);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.buttonHelp);
-            this.Controls.Add(this.buttonAbout);
-            this.Controls.Add(this.labelStep);
-            this.Controls.Add(this.labelProgress);
-            this.Controls.Add(this.butBack);
-            this.Controls.Add(this.butNext);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.lbLogging);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "FormMain";
-            this.Text = "Donor Year End Statement";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
-            this.contextMenuStrip1.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(957, 622);
+            Controls.Add(Exit);
+            Controls.Add(label1);
+            Controls.Add(buttonHelp);
+            Controls.Add(buttonAbout);
+            Controls.Add(labelStep);
+            Controls.Add(labelProgress);
+            Controls.Add(butBack);
+            Controls.Add(butNext);
+            Controls.Add(panel1);
+            Controls.Add(lbLogging);
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "FormMain";
+            Text = "Donor Year End Statement";
+            FormClosed += FormMain_FormClosed;
+            contextMenuStrip1.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
         }
 
 
@@ -212,6 +232,7 @@ namespace DonorStatement
         private System.Windows.Forms.Button buttonAbout;
         private System.Windows.Forms.Button buttonHelp;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button Exit;
     }
 }
 

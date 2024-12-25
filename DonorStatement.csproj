@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
@@ -22,14 +22,14 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <WarningLevel>3</WarningLevel>
+    <WarningLevel>9999</WarningLevel>
     <LangVersion>latestmajor</LangVersion>
     <NoWarn>CA1416</NoWarn>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <WarningLevel>3</WarningLevel>
+    <WarningLevel>9999</WarningLevel>
     <DebugSymbols>true</DebugSymbols>
     <LangVersion>latestmajor</LangVersion>
     <NoWarn>CA1416</NoWarn>
@@ -38,6 +38,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <SignAssembly>False</SignAssembly>
+    <Company />
   </PropertyGroup>
   <ItemGroup>
     <COMReference Include="AMovie">
@@ -90,5 +94,24 @@
     <Content Include="icon.ico" />
     <Content Include="License.txt" />
     <Content Include="notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MessageBoxCenteredDll\MessageBoxCenteredDll.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="DonorStatement.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>

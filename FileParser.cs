@@ -1,19 +1,15 @@
-﻿// Copyright © 2016-20123  ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
-using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Copyright © 2016-2024 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
 using Microsoft.VisualBasic.FileIO;
+using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Xml.Serialization;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace DonorStatement
 {
-    public class FileParser: IDisposable
+    public partial class FileParser: IDisposable
     {
         readonly LogMessageDelegate m_logger;
         DataTable m_dataTable = new();
@@ -32,7 +28,7 @@ namespace DonorStatement
             if (string.IsNullOrWhiteSpace(FormMain.Config.InputFileName))
             {
                 m_logger("Input file name has not been set");
-                MessageBox.Show("Input file name has not been set");
+                FormMain.MessageBox("Input file name has not been set");
                 return false;
             }
 
