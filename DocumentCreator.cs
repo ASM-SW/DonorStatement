@@ -346,14 +346,12 @@ namespace DonorStatement
 
             // check for second Email and include it in semicolon separated list
             int idxEmail2 = table.Columns.IndexOf("Email2");
-            int idx2 = table.Columns.IndexOf("entity_column_customer_udcf_9");  // weired column name in report
             string email2 = string.Empty;
-            if (idx2 >= 0)
-                email2 = table.Rows[0][idx2].ToString();
-            else if (idxEmail2 >= 0)
+            if (idxEmail2 >= 0)
                 email2 = table.Rows[0][idxEmail2].ToString();
             if (!string.IsNullOrEmpty(email2) && email2 != "--")
                 email += "; " + email2;
+            email = email.Replace(",", ";");  // newer way is to put multiple emails into the email field with a comma separate. Convert to ; which email programs like
 
             // create filename replacing certain characters
             string fileName = nameLastFirst;
@@ -434,13 +432,21 @@ namespace DonorStatement
                 return false;
             }
             bool bAddedRow = false;
+            decimal total = 0;
+            int amtColumn = 3;
+            if(rows.Count > 0)
+                amtColumn = rows[0].Fields.Count - 1;
+            
             foreach (PaymentItem item in rows)
             {
                 if (item.IsDonation == isDonation)
                 {
                     AppendRowToTable(item.Fields, ref table);
                     bAddedRow = true;
+                    if (decimal.TryParse(item.Fields[amtColumn], NumberStyles.Currency, CultureInfo.CurrentCulture, out decimal thisAmount))
+                        total += thisAmount;
                 }
+
             }
 
             if (!bAddedRow)
@@ -456,6 +462,12 @@ namespace DonorStatement
                 else
                     item.Fields.Add("No Other Payments");
                 AppendRowToTable(item.Fields, ref table);
+            } 
+            else
+            {
+                PaymentItem totalItem = new PaymentItem();
+                totalItem.Fields = new List<string> { "", "", "Total", total.ToString("C2", CultureInfo.CurrentCulture) };
+                AppendRowToTable(totalItem.Fields, ref table, true, true);
             }
 
 
@@ -467,13 +479,19 @@ namespace DonorStatement
         /// </summary>
         /// <param name="values">list of values used to create the row in the table</param>
         /// <param name="table">the table to modify</param>
-        private static void AppendRowToTable(List<string> values, ref Word.Table table)
+        /// <param name="bAlignRight">if true, aligns the text in the row to the right</param>
+        /// <param name="bBold">if true, makes the text in the row bold</param>
+        private static void AppendRowToTable(List<string> values, ref Word.Table table, bool bBold = false, bool bAlignRight= false)
         {
             Word.Row row = table.Rows.Add(System.Reflection.Missing.Value);
             int i = 0;
             foreach (string item in values)
             {
                 row.Cells[++i].Range.Text = item;
+                if (bBold)
+                    row.Cells[i].Range.Bold = 1;
+                if (bAlignRight)
+                    row.Cells[i].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
             }
         }
 
