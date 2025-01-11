@@ -234,6 +234,7 @@ namespace DonorStatement
             // Get name, in case one is empty, make them both equal
             // if both empty give up
             string nameLastFirst = table.Rows[0]["Customer"].ToString();
+            nameLastFirst = nameLastFirst.TrimEnd('_');
             if (string.IsNullOrWhiteSpace(nameLastFirst))
                 return;  // should never happen
             RemoveDeletedFromString(ref nameLastFirst);
@@ -250,7 +251,7 @@ namespace DonorStatement
                 first = first.Trim();
                 last = nameLastFirst[..commaPos];
                 last = last.Trim();
-                last = last.Trim('_');
+                last = last.TrimEnd('_');
                 customerName = string.Format("{0} {1}", first, last);
             }
 
