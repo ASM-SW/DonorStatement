@@ -129,7 +129,7 @@ namespace DonorStatement
             this.textDateRange.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.textDateRange.Size = new System.Drawing.Size(696, 20);
             this.textDateRange.TabIndex = 8;
-            this.textDateRange.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
+            this.textDateRange.TextChanged += new System.EventHandler(this.TextBoxDateRange_TextChanged);
             // 
             // labelDateRange
             // 
