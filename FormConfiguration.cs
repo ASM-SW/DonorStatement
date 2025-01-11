@@ -69,7 +69,7 @@ namespace DonorStatement
             }
         }
 
-        private void TextBox1_TextChanged(object sender, EventArgs e)
+        private void TextBoxDateRange_TextChanged(object sender, EventArgs e)
         {
             FormMain.Config.DateRange = textDateRange.Text;
         }
@@ -89,25 +89,35 @@ namespace DonorStatement
         /// <returns></returns>
         public bool CanExit(out string errorMsg)
         {
+            // update fields
+            FormMain.Config.OutputDirectory = textOutputDirectory.Text.Trim();
+            FormMain.Config.DateRange = textDateRange.Text.Trim();
+            FormMain.Config.InputFileName = textInputFile.Text.Trim();
+            FormMain.Config.WordTemplateFileName = textWordTemplate.Text.Trim();
+
             bool res = true;
             StringBuilder msg = new("Errors in Configuration: \n");
 
-            
+            if (FormMain.Config.InputFileName.StartsWith(FormMain.Config.OutputDirectory) || 
+                FormMain.Config.WordTemplateFileName.StartsWith(FormMain.Config.OutputDirectory))
+            {
+                msg.AppendFormat("- Input file and Word template file, cannot be in the output directory\n");
+                res = false;
+            }
+                        
             FormMain.Config.InputFileName = textInputFile.Text;
             if(!File.Exists(FormMain.Config.InputFileName))
             {
                 msg.AppendFormat("- Input file does not exist: {0}\n", FormMain.Config.InputFileName);
                 res = false;
             }
-
-            FormMain.Config.WordTemplateFileName = textWordTemplate.Text;
+           
             if(!File.Exists(FormMain.Config.WordTemplateFileName))
             {
                 msg.AppendFormat("- Word template file does not exist: {0}\n", FormMain.Config.WordTemplateFileName);
                 res = false;
             }
 
-            FormMain.Config.OutputDirectory = textOutputDirectory.Text;
             if(!Directory.Exists(FormMain.Config.OutputDirectory))
             {
                 msg.AppendFormat("- Output Directory does not exist: {0}\n", FormMain.Config.OutputDirectory);
