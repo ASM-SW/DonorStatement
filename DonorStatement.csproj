@@ -44,6 +44,9 @@
     <Company />
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="DocumentCreator.cs.orig" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="AMovie">
       <Guid>{05589FA0-C356-11CE-BF01-00AA0055595A}</Guid>
       <VersionMajor>2</VersionMajor>
@@ -106,6 +109,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Update="ColumnMappings.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="DonorStatement.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

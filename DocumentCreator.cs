@@ -1,4 +1,4 @@
-﻿// Copyright © 2016-2024 ASM-SW
+﻿// Copyright © 2016-2025 ASM-SW
 //asm-sw@outlook.com  https://github.com/asm-sw
 using MessageBoxCenteredDll;
 using System;
@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace DonorStatement
@@ -56,41 +56,24 @@ namespace DonorStatement
         private readonly LogMessageDelegate m_logger;
         private readonly List<DonorRecord> m_Files = [];
 
-        // List of colun names used for report.  This must be manually maintained.
-        // used to check if DataTable has the correct columns
-        /*
-        column mapping
-        Req Desktop          online           note
-        --- ---------------  ---------------- ---------------------------------------
-        X   Date             Date   
-        x   Item             Name             new product servcie does not have the  xxxx:
-        X   Memo             Memo/Description    
-        X   Name             Customer name    last name, first names
-        x   Name City        Billing city   
-        X   Name Contact                      first last,  no commas
-        x   Name E-Mail      Email
-        x   Name State       Billing state  
-        x   Name Street1     Billing street  Billing street may include multiple lines separate by ctrl chars
-        x   Name Street2        
-        x   Name Zip         Billing zip code   
-        x   Paid Amount      Amount line   new has $ and commas
-            Account          Account name     old had # + name, new just name
-            Name Phone #        
-            Type        
+        // Dictionary of column names used for report.
+        // update ColumnNappings.xml to match the column names in the input file
+        // this file is copied during build to output directory
+        private static readonly Dictionary<string, string> m_columnMappings = [];
+        private static void LoadColumnMappings()
+        {
+            string assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (string.IsNullOrWhiteSpace(assemblyDirectory))
+            {
+                throw new InvalidOperationException("Unable to determine the directory of the executing assembly.");
+            }
 
-        */
-        private static readonly List<string> m_requiredColumnNames =
-        [
-            "Date",
-            "Product/Service",       // name of purchase
-            "Billing city",
-            "Customer",   // last, first
-            "Email",
-            "Billing state",
-            "Billing street",
-            "Billing zip code",
-            "Amount"          // has $ and commas
-        ];
+            string columnMappingsFilePath = Path.Combine(assemblyDirectory, "ColumnMappings.xml");
+            ColumnMappings columnMappings = ColumnMappings.Deserialize(columnMappingsFilePath);
+
+            foreach (var mapping in columnMappings.Mappings)
+                m_columnMappings[mapping.Key] = mapping.Value;
+            }
 
         private static readonly List<string> m_requiredBookmarkNames =
         [
@@ -105,6 +88,7 @@ namespace DonorStatement
 
         public DocumentCreator(LogMessageDelegate logger)
         {
+            LoadColumnMappings();
             m_logger = logger;
         }
 
@@ -156,13 +140,13 @@ namespace DonorStatement
         {
             StringBuilder msg = new("CSV input file is missing the following columns: ");
             int cnt = 0;
-            foreach (string name in m_requiredColumnNames)
+            foreach (var mapping in m_columnMappings)
             {
-                if (!columnNames.Contains(name))
+                if (!columnNames.Contains(mapping.Value))
                 {
                     if (cnt++ > 0)
                         msg.Append(", ");
-                    msg.AppendFormat(" \"{0}\"", name);
+                    msg.AppendFormat(" \"{0}\"", mapping.Value);
                 }
             }
             if (cnt > 0)
@@ -233,7 +217,7 @@ namespace DonorStatement
 
             // Get name, in case one is empty, make them both equal
             // if both empty give up
-            string nameLastFirst = table.Rows[0]["Customer"].ToString();
+            string nameLastFirst = table.Rows[0][m_columnMappings["Customer"]].ToString();
             nameLastFirst = nameLastFirst.TrimEnd('_');
             if (string.IsNullOrWhiteSpace(nameLastFirst))
                 return;  // should never happen
@@ -283,9 +267,9 @@ namespace DonorStatement
             int ndxLast = table.Rows.Count - 1;
             StringBuilder builderToAddress = new();
             builderToAddress.AppendLine(customerName);
-            builderToAddress.AppendLine(table.Rows[ndxLast]["Billing street"].ToString());
+            builderToAddress.AppendLine(table.Rows[ndxLast][m_columnMappings["Billing street"]].ToString());
             bool bSkippedLine = false;
-            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[ndxLast]["Billing city"].ToString(), table.Rows[ndxLast]["Billing state"].ToString(), table.Rows[ndxLast]["Billing zip code"].ToString());
+            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[ndxLast][m_columnMappings["Billing city"]].ToString(), table.Rows[ndxLast][m_columnMappings["Billing state"]].ToString(), table.Rows[ndxLast][m_columnMappings["Billing zip code"]].ToString());
             if (bSkippedLine)
                 builderToAddress.AppendLine();
 
@@ -303,7 +287,7 @@ namespace DonorStatement
             foreach (DataRow row in table.Rows)
             {
                 PaymentItem payment = new();
-                string item = row["Product/Service"].ToString();
+                string item = row[m_columnMappings["Product/Service"]].ToString();
                 if (item == "--")
                     continue;
                 if (string.IsNullOrWhiteSpace(item))
@@ -314,13 +298,13 @@ namespace DonorStatement
                     payment.IsDonation = true;
                 RemoveDeletedFromString(ref item);
 
-                payment.Fields.Add(row["Date"].ToString());
+                payment.Fields.Add(row[m_columnMappings["Date"]].ToString());
                 payment.Fields.Add(item);
                 string description = row["Memo/Description"].ToString();
                 if (description == "--")
                     description = string.Empty;
                 payment.Fields.Add(description);
-                string paid = row["Amount"].ToString();
+                string paid = row[m_columnMappings["Amount"]].ToString();
                 if (decimal.TryParse(paid, NumberStyles.Currency, CultureInfo.CurrentCulture, out decimal thisAmount))
                 {
                     total += thisAmount;
@@ -341,7 +325,7 @@ namespace DonorStatement
                 oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
                 return;
             }
-            string email = table.Rows[0]["Email"].ToString();
+            string email = table.Rows[0][m_columnMappings["Email"]].ToString();
             if (email == "--")
                 email = string.Empty;
 
@@ -466,8 +450,10 @@ namespace DonorStatement
             } 
             else
             {
-                PaymentItem totalItem = new PaymentItem();
-                totalItem.Fields = new List<string> { "", "", "Total", total.ToString("C2", CultureInfo.CurrentCulture) };
+                PaymentItem totalItem = new()
+                {
+                    Fields = ["", "", "Total", total.ToString("C2", CultureInfo.CurrentCulture)]
+                };
                 AppendRowToTable(totalItem.Fields, ref table, true, true);
             }
 
@@ -480,8 +466,8 @@ namespace DonorStatement
         /// </summary>
         /// <param name="values">list of values used to create the row in the table</param>
         /// <param name="table">the table to modify</param>
-        /// <param name="bAlignRight">if true, aligns the text in the row to the right</param>
-        /// <param name="bBold">if true, makes the text in the row bold</param>
+        /// <param name="bBold">if true, aligns the text in the row to the right</param>
+        /// <param name="bAlignRight">if true, makes the text in the row bold</param>
         private static void AppendRowToTable(List<string> values, ref Word.Table table, bool bBold = false, bool bAlignRight= false)
         {
             Word.Row row = table.Rows.Add(System.Reflection.Missing.Value);

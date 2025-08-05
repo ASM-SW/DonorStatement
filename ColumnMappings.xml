@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright © 2025 ASM-SW
+    asm-sw@outlook.com  https://github.com/asm-sw
+-->
+<ColumnMappings>
+  <Mappings>
+    <Mapping>
+      <Key>Date</Key>
+      <Value>Date</Value>
+    </Mapping>
+    <Mapping>
+      <Key>Product/Service</Key>
+      <Value>Product/Service</Value>
+    </Mapping>
+    <Mapping>
+      <Key>Billing city</Key>
+      <Value>Billing city</Value>
+    </Mapping>
+    <Mapping>
+      <Key>Customer</Key>
+      <Value>Customer</Value>
+    </Mapping>
+    <Mapping>
+      <Key>Email</Key>
+      <Value>Email</Value>
+    </Mapping>
+    <Mapping>
+      <Key>Billing state</Key>
+      <Value>Billing state</Value>
+    </Mapping>
+    <Mapping>
+      <Key>Billing street</Key>
+      <Value>Billing street</Value>
+    </Mapping>
+    <Mapping>
+      <Key>Billing zip code</Key>
+      <Value>Billing zip code</Value>
+    </Mapping>
+    <Mapping>
+      <Key>Amount</Key>
+      <Value>Amount</Value>
+    </Mapping>
+  </Mappings>
+</ColumnMappings>
