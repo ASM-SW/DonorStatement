@@ -1,4 +1,4 @@
-﻿// Copyright © 2016  ASM-SW
+﻿// Copyright © 2016-2023  ASM-SW
 //asmeyers@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
@@ -12,11 +12,11 @@ namespace DonorStatement
     {
         private FormCreateDocs() { }
 
-        FileParser m_parser;
-        DocumentCreator m_docCreator;
-        LogMessageDelegate m_logger;
+        readonly FileParser m_parser;
+        readonly DocumentCreator m_docCreator;
+        readonly LogMessageDelegate m_logger;
         string m_strProgress = string.Empty;
-        object m_strProgressLock = new object();
+        readonly object m_strProgressLock = new();
 
         public FormCreateDocs(ref FileParser parser, ref DocumentCreator docCreator, ref LogMessageDelegate logger)
         {
@@ -30,7 +30,7 @@ namespace DonorStatement
             backgroundWorker1.WorkerReportsProgress = true;
         }
 
-        private void startButton_Click(object sender, EventArgs e)
+        private void StartButton_Click(object sender, EventArgs e)
         {
             buttonReloadFile.Enabled = false;
             buttonStart.Enabled = false;
@@ -47,17 +47,15 @@ namespace DonorStatement
             if(!m_parser.FileHasBeenRead)
                 m_parser.ParseInputFile();
 
-            List<string> columnNames;
-            m_parser.GetColumnNames(out columnNames);
-            if(!m_docCreator.CheckForColumns(ref columnNames))
+            m_parser.GetColumnNames(out List<string> columnNames);
+            if (!m_docCreator.CheckForColumns(ref columnNames))
             {
                 m_docCreator.CreateDocsDone();
                 return;
             }
             m_docCreator.CheckForBookmarksAndTables();
 
-            List<string> names;
-            m_parser.GetNameList(out names);
+            m_parser.GetNameList(out List<string> names);
 
             for (int i = 0; i < names.Count; i++)
             {
@@ -68,8 +66,7 @@ namespace DonorStatement
                     e.Cancel = true;
                     break;
                 }
-                DataTable table;
-                m_parser.GetDataForName(names[i], out table);
+                m_parser.GetDataForName(names[i], out DataTable table);
                 m_docCreator.CreateDoc(table);
 
                 int percentComplete = (int)((float)(i + 1) / (float)names.Count * 100.0);
@@ -84,7 +81,7 @@ namespace DonorStatement
         }
 
 
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BackgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressBar1.Value = e.ProgressPercentage;
             lock (m_strProgressLock)
@@ -93,25 +90,25 @@ namespace DonorStatement
             }
         }
 
-        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BackgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             buttonStart.Enabled = true;
             buttonStop.Enabled = false;
             buttonReloadFile.Enabled = true;
         }
-        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void BackgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
             BackgroundWork(worker, e);
         }
 
-        private void buttonStop_Click(object sender, EventArgs e)
+        private void ButtonStop_Click(object sender, EventArgs e)
         {
             if (backgroundWorker1.IsBusy)
                 backgroundWorker1.CancelAsync();
         }
 
-        private void buttonReloadFile_Click(object sender, EventArgs e)
+        private void ButtonReloadFile_Click(object sender, EventArgs e)
         {
             m_parser.ParseInputFile();
         }
