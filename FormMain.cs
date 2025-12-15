@@ -57,6 +57,7 @@ namespace DonorStatement
             m_docCreator = new DocumentCreator(m_loggerDelegate);
             m_parser = new FileParser(m_loggerDelegate);
             MainForm = this;
+            ColumnMap.SetLogger(m_loggerDelegate);
 
             InitializeComponent();
             InitializeControls();

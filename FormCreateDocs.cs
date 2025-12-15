@@ -11,8 +11,6 @@ namespace DonorStatement
 {
     public partial class FormCreateDocs : Form
     {
-        private FormCreateDocs() { }
-
         readonly FileParser m_parser;
         readonly DocumentCreator m_docCreator;
         readonly LogMessageDelegate m_logger;
@@ -57,7 +55,7 @@ namespace DonorStatement
                 m_parser.ParseInputFile();
 
             m_parser.GetColumnNames(out List<string> columnNames);
-            if (!DocumentCreator.CheckForColumns(ref columnNames))
+            if (!ColumnMap.CheckForColumns(ref columnNames))
             {
                 m_docCreator.CreateDocsDone();
                 EnableButtons();

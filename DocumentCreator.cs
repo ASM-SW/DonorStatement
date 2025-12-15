@@ -17,8 +17,6 @@ namespace DonorStatement
     /// </summary>
     public class DonorRecord
     {
-        private DonorRecord() { }
-
         public DonorRecord(string name, string fileName, string email, string nameLastFirst)
         {
             Name = name;
@@ -56,25 +54,6 @@ namespace DonorStatement
         private readonly LogMessageDelegate m_logger;
         private readonly List<DonorRecord> m_Files = [];
 
-        // Dictionary of column names used for report.
-        // update ColumnNappings.xml to match the column names in the input file
-        // this file is copied during build to output directory
-        private static readonly Dictionary<string, string> m_columnMappings = [];
-        private static void LoadColumnMappings()
-        {
-            string assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (string.IsNullOrWhiteSpace(assemblyDirectory))
-            {
-                throw new InvalidOperationException("Unable to determine the directory of the executing assembly.");
-            }
-
-            string columnMappingsFilePath = Path.Combine(assemblyDirectory, "ColumnMappings.xml");
-            ColumnMappings columnMappings = ColumnMappings.Deserialize(columnMappingsFilePath);
-
-            foreach (var mapping in columnMappings.Mappings)
-                m_columnMappings[mapping.Key] = mapping.Value;
-            }
-
         private static readonly List<string> m_requiredBookmarkNames =
         [
             "Name",
@@ -84,11 +63,8 @@ namespace DonorStatement
             "Total",
         ];
 
-        private DocumentCreator() { }
-
         public DocumentCreator(LogMessageDelegate logger)
         {
-            LoadColumnMappings();
             m_logger = logger;
         }
 
@@ -129,32 +105,12 @@ namespace DonorStatement
 
         public void CreateDocsDone()
         {
-            if (m_word != null)
+            if (m_word == null)
             {
-                m_word.Quit();
-                m_word = null;
+                return;
             }
-        }
-
-        public static bool CheckForColumns(ref List<string> columnNames)
-        {
-            StringBuilder msg = new("CSV input file is missing the following columns: ");
-            int cnt = 0;
-            foreach (var mapping in m_columnMappings)
-            {
-                if (!columnNames.Contains(mapping.Value))
-                {
-                    if (cnt++ > 0)
-                        msg.Append(", ");
-                    msg.AppendFormat(" \"{0}\"", mapping.Value);
-                }
-            }
-            if (cnt > 0)
-            {
-                FormMain.MessageBoxError(msg.ToString());
-                return false;
-            }
-            return true;
+            m_word.Quit();
+            m_word = null;
         }
 
         public bool CheckForBookmarksAndTables()
@@ -192,13 +148,12 @@ namespace DonorStatement
                 cnt++;
                 msg.AppendFormat(" \"{0}\"", "TablePayments");
             }
-            if (FormMain.Config.ReportOtherPayments)
-                if (!FindTable("TableOtherPayments", oDoc, out table))
-                {
-                    if (cnt++ > 0)
-                        msg.Append(", ");
-                    msg.AppendFormat(" \"{0}\"", "TableOtherPaymetns");
-                }
+            if (FormMain.Config.ReportOtherPayments && !FindTable("TableOtherPayments", oDoc, out table))
+            {
+                if (cnt++ > 0)
+                    msg.Append(", ");
+                msg.AppendFormat(" \"{0}\"", "TableOtherPaymetns");
+            }
             if (cnt > 0)
             {
                 FormMain.MessageBox(msg.ToString());
@@ -217,7 +172,7 @@ namespace DonorStatement
 
             // Get name, in case one is empty, make them both equal
             // if both empty give up
-            string nameLastFirst = table.Rows[0][m_columnMappings["Customer"]].ToString();
+            string nameLastFirst = table.Rows[0][ColumnMap.Lookup("Customer")].ToString();
             nameLastFirst = nameLastFirst.TrimEnd('_');
             if (string.IsNullOrWhiteSpace(nameLastFirst))
                 return;  // should never happen
@@ -267,11 +222,8 @@ namespace DonorStatement
             int ndxLast = table.Rows.Count - 1;
             StringBuilder builderToAddress = new();
             builderToAddress.AppendLine(customerName);
-            builderToAddress.AppendLine(table.Rows[ndxLast][m_columnMappings["Billing street"]].ToString());
-            bool bSkippedLine = false;
-            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[ndxLast][m_columnMappings["Billing city"]].ToString(), table.Rows[ndxLast][m_columnMappings["Billing state"]].ToString(), table.Rows[ndxLast][m_columnMappings["Billing zip code"]].ToString());
-            if (bSkippedLine)
-                builderToAddress.AppendLine();
+            builderToAddress.AppendLine(table.Rows[ndxLast][ColumnMap.Lookup("Billing street")].ToString());
+            builderToAddress.AppendFormat("{0}, {1}  {2}", table.Rows[ndxLast][ColumnMap.Lookup("Billing city")].ToString(), table.Rows[ndxLast][ColumnMap.Lookup("Billing state")].ToString(), table.Rows[ndxLast][ColumnMap.Lookup("Billing zip code")].ToString());
 
             bookMarks.Add(new KeyValuePair<string, string>("ToAddress", builderToAddress.ToString()));
             bookMarks.Add(new KeyValuePair<string, string>("YearDateRange", FormMain.Config.DateRange));
@@ -287,7 +239,7 @@ namespace DonorStatement
             foreach (DataRow row in table.Rows)
             {
                 PaymentItem payment = new();
-                string item = row[m_columnMappings["Product/Service"]].ToString();
+                string item = row[ColumnMap.Lookup("Product/Service")].ToString();
                 if (item == "--")
                     continue;
                 if (string.IsNullOrWhiteSpace(item))
@@ -298,13 +250,13 @@ namespace DonorStatement
                     payment.IsDonation = true;
                 RemoveDeletedFromString(ref item);
 
-                payment.Fields.Add(row[m_columnMappings["Date"]].ToString());
+                payment.Fields.Add(row[ColumnMap.Lookup("Date")].ToString());
                 payment.Fields.Add(item);
                 string description = row["Memo/Description"].ToString();
                 if (description == "--")
                     description = string.Empty;
                 payment.Fields.Add(description);
-                string paid = row[m_columnMappings["Amount"]].ToString();
+                string paid = row[ColumnMap.Lookup("Amount")].ToString();
                 if (decimal.TryParse(paid, NumberStyles.Currency, CultureInfo.CurrentCulture, out decimal thisAmount))
                 {
                     total += thisAmount;
@@ -325,7 +277,7 @@ namespace DonorStatement
                 oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
                 return;
             }
-            string email = table.Rows[0][m_columnMappings["Email"]].ToString();
+            string email = table.Rows[0][ColumnMap.Lookup("Email")].ToString();
             if (email == "--")
                 email = string.Empty;
 
@@ -363,7 +315,6 @@ namespace DonorStatement
             const string strDeleted = " (deleted)";
             if (item.EndsWith(strDeleted))
                 item = item[..item.LastIndexOf(strDeleted)];
-            return;
         }
 
         /// <summary>
@@ -377,7 +328,7 @@ namespace DonorStatement
         private bool CreatePdfFile(List<KeyValuePair<string, string>> bookMarks, List<PaymentItem> payments, Word.Document oDoc, string fileName)
         {
             m_logger("Creating: " + fileName);
-            bool result = false;
+            bool result = true;
             foreach (KeyValuePair<string, string> item in bookMarks)
             {
                 if (!UpdateBookmark(item.Key, oDoc, item.Value))
@@ -388,12 +339,9 @@ namespace DonorStatement
                 result = false;
             }
 
-            if (FormMain.Config.ReportOtherPayments)
+            if (FormMain.Config.ReportOtherPayments && !UpdateTable(oDoc, "TableOtherPayments", payments, false))
             {
-                if (!UpdateTable(oDoc, "TableOtherPayments", payments, false))
-                {
-                    result = false;
-                }
+                result = false;
             }
             SavePdf(oDoc, fileName);
             oDoc.Close(Word.WdSaveOptions.wdDoNotSaveChanges, m_oMissing, m_oMissing);
@@ -419,9 +367,9 @@ namespace DonorStatement
             bool bAddedRow = false;
             decimal total = 0;
             int amtColumn = 3;
-            if(rows.Count > 0)
+            if (rows.Count > 0)
                 amtColumn = rows[0].Fields.Count - 1;
-            
+
             foreach (PaymentItem item in rows)
             {
                 if (item.IsDonation == isDonation)
@@ -447,7 +395,7 @@ namespace DonorStatement
                 else
                     item.Fields.Add("No Other Payments");
                 AppendRowToTable(item.Fields, ref table);
-            } 
+            }
             else
             {
                 PaymentItem totalItem = new()
@@ -468,7 +416,7 @@ namespace DonorStatement
         /// <param name="table">the table to modify</param>
         /// <param name="bBold">if true, aligns the text in the row to the right</param>
         /// <param name="bAlignRight">if true, makes the text in the row bold</param>
-        private static void AppendRowToTable(List<string> values, ref Word.Table table, bool bBold = false, bool bAlignRight= false)
+        private static void AppendRowToTable(List<string> values, ref Word.Table table, bool bBold = false, bool bAlignRight = false)
         {
             Word.Row row = table.Rows.Add(System.Reflection.Missing.Value);
             int i = 0;

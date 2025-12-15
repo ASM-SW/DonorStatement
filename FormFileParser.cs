@@ -58,7 +58,7 @@ namespace DonorStatement
             for (int i = 0; i < FormMain.Config.ItemListNotSelected.Count; i++)
             {
                 if (itemListFromFile.BinarySearch(FormMain.Config.ItemListNotSelected[i]) < 0)
-                    indexItemsToRemove.Insert(0, i);  
+                    indexItemsToRemove.Insert(0, i);
             }
             // The iteration and remove is working because theindexItemsToRemove is automatically reverse sorted by inserting at the beginning, see above
             foreach (int item in indexItemsToRemove)

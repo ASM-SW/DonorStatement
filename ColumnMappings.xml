@@ -7,7 +7,7 @@
   <Mappings>
     <Mapping>
       <Key>Date</Key>
-      <Value>Date</Value>
+      <Value>Transaction date</Value>
     </Mapping>
     <Mapping>
       <Key>Product/Service</Key>
@@ -15,7 +15,7 @@
     </Mapping>
     <Mapping>
       <Key>Billing city</Key>
-      <Value>Billing city</Value>
+      <Value>Customer bill city</Value>
     </Mapping>
     <Mapping>
       <Key>Customer</Key>
@@ -23,19 +23,19 @@
     </Mapping>
     <Mapping>
       <Key>Email</Key>
-      <Value>Email</Value>
+      <Value>Customer email</Value>
     </Mapping>
     <Mapping>
       <Key>Billing state</Key>
-      <Value>Billing state</Value>
+      <Value>Customer bill state</Value>
     </Mapping>
     <Mapping>
       <Key>Billing street</Key>
-      <Value>Billing street</Value>
+      <Value>Customer bill street</Value>
     </Mapping>
     <Mapping>
       <Key>Billing zip code</Key>
-      <Value>Billing zip code</Value>
+      <Value>Customer bill zip</Value>
     </Mapping>
     <Mapping>
       <Key>Amount</Key>
