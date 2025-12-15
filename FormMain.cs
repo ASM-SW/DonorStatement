@@ -1,7 +1,9 @@
-﻿// Copyright © 2016-2018  ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2016-2024 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
+using MessageBoxCenteredDll;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -12,16 +14,33 @@ namespace DonorStatement
 
     public partial class FormMain : Form
     {
+        private static Form MainForm { get; set; }
+        public static Rectangle Rectangle
+        {
+            get
+            {
+                Rectangle rect = new((int)MainForm.Left, (int)MainForm.Top, (int)MainForm.Width, (int)MainForm.Height);
+                return rect;
+            }
+        }
+
+        public static MessageBoxCentered.ButtonTyp MessageBox(string message) => MessageBoxCentered.ShowDialog(Rectangle, string.Empty, message, MessageBoxCentered.BoxType.Ok);
+        public static MessageBoxCentered.ButtonTyp MessageBoxError(string message) => MessageBoxCentered.ShowDialog(Rectangle, "ERROR", message, MessageBoxCentered.BoxType.Ok);
+
+        public static MessageBoxCentered.ButtonTyp MessageBoxEx(string caption, string message, MessageBoxCentered.BoxType boxType) =>
+            MessageBoxCentered.ShowDialog(Rectangle, caption, message, boxType);
+
         public enum PanelNavDirection
         {
             forward,
             backward
         }
 
-        private List<Form> m_forms = new List<Form>();
+
+        readonly private List<Form> m_forms = [];
         LogMessageDelegate m_loggerDelegate;
 
-        private UInt32 LogMaxLines = 250;
+        readonly private UInt32 LogMaxLines = 250;
         DocumentCreator m_docCreator;
         FileParser m_parser;
         int m_activeForm = -1;
@@ -31,11 +50,14 @@ namespace DonorStatement
         public FormMain()
         {
             m_loggerDelegate = LogMessage;
-            ConfigurationDYES cfg = new ConfigurationDYES();
-            ConfigurationDYES.DeSerialize(cfg.ConfigFileName, ref cfg);
+            ConfigurationDYES cfg = new();
+            if (!ConfigurationDYES.DeSerialize(cfg.ConfigFileName, ref cfg))
+                Environment.Exit(-1);
             Config = cfg;
             m_docCreator = new DocumentCreator(m_loggerDelegate);
             m_parser = new FileParser(m_loggerDelegate);
+            MainForm = this;
+            ColumnMap.SetLogger(m_loggerDelegate);
 
             InitializeComponent();
             InitializeControls();
@@ -59,7 +81,7 @@ namespace DonorStatement
             m_forms[0].Show();
             butBack.Enabled = false;
 
-            label1.Text = "Version: " +Application.ProductVersion;
+            label1.Text = "Version: " + Application.ProductVersion;
             LogMessage(label1.Text);
             LogMessage("Configuration data from last run: " + Config.ConfigFileName);
 
@@ -77,13 +99,12 @@ namespace DonorStatement
 
         private bool SubFormOkToExit()
         {
-            if (m_forms[m_activeForm] is ISubForm)
+            if (m_forms[m_activeForm] is ISubForm form)
             {
-                string errorMsg;
-                if (((ISubForm)m_forms[m_activeForm]).CanExit(out errorMsg))
+                if (form.CanExit(out string errorMsg))
                     return true;
 
-                MessageBox.Show(errorMsg);
+                FormMain.MessageBoxError(errorMsg);
                 return false;
             }
             return true;
@@ -126,7 +147,7 @@ namespace DonorStatement
                 panel1.Controls[0].Hide();
                 panel1.Controls.RemoveAt(0);
             }
-      
+
             panel1.Controls.Add(m_forms[m_activeForm]);
             panel1.Controls[0].Show();
             labelStep.Text = panel1.Controls[0].AccessibleDescription;
@@ -151,7 +172,7 @@ namespace DonorStatement
         {
             if (lbLogging.InvokeRequired)
             {
-                LogMessageDelegate update = new LogMessageDelegate(LogMessage);
+                LogMessageDelegate update = new(LogMessage);
                 lbLogging.Invoke(update, msg);
             }
             else
@@ -169,13 +190,13 @@ namespace DonorStatement
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void ContextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             switch (e.ClickedItem.Text)
             {
                 case "&Copy":
                     {
-                        StringBuilder str = new StringBuilder();
+                        StringBuilder str = new();
                         if (lbLogging.SelectedItems.Count == 0)
                             break;
                         foreach (var item in lbLogging.SelectedItems)
@@ -202,34 +223,39 @@ namespace DonorStatement
             Config.Serialize(Config.ConfigFileName);
         }
 
-        private void butNext_Click(object sender, EventArgs e)
+        private void ButNext_Click(object sender, EventArgs e)
         {
             SwitchPanelForm(PanelNavDirection.forward);
         }
 
-        private void butBack_Click(object sender, EventArgs e)
+        private void ButBack_Click(object sender, EventArgs e)
         {
             SwitchPanelForm(PanelNavDirection.backward);
 
         }
 
-        private void buttonAbout_Click(object sender, EventArgs e)
+        private void ButtonAbout_Click(object sender, EventArgs e)
         {
-            AboutBox1 aboutBox = new AboutBox1(this);
+            AboutBox1 aboutBox = new(this);
             aboutBox.ShowDialog();
         }
 
-        private void buttonHelp_Click(object sender, EventArgs e)
+        private void ButtonHelp_Click(object sender, EventArgs e)
         {
             string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DonorStatement.pdf");
             try
             {
-                System.Diagnostics.Process.Start(fileName);
+                System.Diagnostics.Process.Start("explorer.exe", fileName);
             }
             catch (Exception)
             {
-                MessageBox.Show("Unable to open help file: " + fileName);
+                System.Windows.Forms.MessageBox.Show("Unable to open help file: " + fileName);
             }
+        }
+
+        private void Exit_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     } // Form1
 }

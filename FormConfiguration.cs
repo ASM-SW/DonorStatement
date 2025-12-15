@@ -1,14 +1,8 @@
-﻿// Copyright © 2016-2018  ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2016-2024 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DonorStatement
@@ -43,7 +37,7 @@ namespace DonorStatement
             return false;
         }
 
-        private void butInputFile_Click(object sender, EventArgs e)
+        private void ButInputFile_Click(object sender, EventArgs e)
         {
             string fileName = textInputFile.Text;
             if (SelectFile(ref fileName, "Comma separated file|*.csv|All Files|*.*"))
@@ -53,7 +47,7 @@ namespace DonorStatement
             }
         }
 
-        private void butWordTemplate_Click(object sender, EventArgs e)
+        private void ButWordTemplate_Click(object sender, EventArgs e)
         {
             string fileName = textWordTemplate.Text;
             if (SelectFile(ref fileName, "Word templated file|*.dotx|All Files|*.*"))
@@ -63,7 +57,7 @@ namespace DonorStatement
             }
         }
 
-        private void butOutputFolder_Click(object sender, EventArgs e)
+        private void ButOutputFolder_Click(object sender, EventArgs e)
         {
             string folderName = textOutputDirectory.Text;
             folderBrowserDialog1.SelectedPath = folderName;
@@ -75,7 +69,7 @@ namespace DonorStatement
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void TextBoxDateRange_TextChanged(object sender, EventArgs e)
         {
             FormMain.Config.DateRange = textDateRange.Text;
         }
@@ -95,25 +89,35 @@ namespace DonorStatement
         /// <returns></returns>
         public bool CanExit(out string errorMsg)
         {
-            bool res = true;
-            StringBuilder msg = new StringBuilder("Errors in Configuration: \n");
+            // update fields
+            FormMain.Config.OutputDirectory = textOutputDirectory.Text.Trim();
+            FormMain.Config.DateRange = textDateRange.Text.Trim();
+            FormMain.Config.InputFileName = textInputFile.Text.Trim();
+            FormMain.Config.WordTemplateFileName = textWordTemplate.Text.Trim();
 
-            
+            bool res = true;
+            StringBuilder msg = new("Errors in Configuration: \n");
+
+            if (FormMain.Config.InputFileName.StartsWith(FormMain.Config.OutputDirectory) || 
+                FormMain.Config.WordTemplateFileName.StartsWith(FormMain.Config.OutputDirectory))
+            {
+                msg.AppendFormat("- Input file and Word template file, cannot be in the output directory\n");
+                res = false;
+            }
+                        
             FormMain.Config.InputFileName = textInputFile.Text;
             if(!File.Exists(FormMain.Config.InputFileName))
             {
                 msg.AppendFormat("- Input file does not exist: {0}\n", FormMain.Config.InputFileName);
                 res = false;
             }
-
-            FormMain.Config.WordTemplateFileName = textWordTemplate.Text;
+           
             if(!File.Exists(FormMain.Config.WordTemplateFileName))
             {
                 msg.AppendFormat("- Word template file does not exist: {0}\n", FormMain.Config.WordTemplateFileName);
                 res = false;
             }
 
-            FormMain.Config.OutputDirectory = textOutputDirectory.Text;
             if(!Directory.Exists(FormMain.Config.OutputDirectory))
             {
                 msg.AppendFormat("- Output Directory does not exist: {0}\n", FormMain.Config.OutputDirectory);
@@ -128,7 +132,7 @@ namespace DonorStatement
             return res;
         }
 
-        private void cbReportOtherPayments_CheckedChanged(object sender, EventArgs e)
+        private void CbReportOtherPayments_CheckedChanged(object sender, EventArgs e)
         {
             FormMain.Config.ReportOtherPayments = cbReportOtherPayments.Checked;
         }

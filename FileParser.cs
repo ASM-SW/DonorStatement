@@ -1,23 +1,18 @@
-﻿// Copyright © 2016-20123  ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
-using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Copyright © 2016-2025 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
 using Microsoft.VisualBasic.FileIO;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace DonorStatement
 {
-    public class FileParser: IDisposable
+    public partial class FileParser : IDisposable
     {
         readonly LogMessageDelegate m_logger;
         DataTable m_dataTable = new();
         public bool FileHasBeenRead { get; set; }
-        private FileParser() { }
         bool m_disposed = false;
 
         public FileParser(LogMessageDelegate logger)
@@ -31,7 +26,7 @@ namespace DonorStatement
             if (string.IsNullOrWhiteSpace(FormMain.Config.InputFileName))
             {
                 m_logger("Input file name has not been set");
-                MessageBox.Show("Input file name has not been set");
+                FormMain.MessageBox("Input file name has not been set");
                 return false;
             }
 
@@ -39,21 +34,38 @@ namespace DonorStatement
             if (FileHasBeenRead)
                 m_dataTable = new DataTable();
 
-            FileHasBeenRead = true;
             try
             {
                 using TextFieldParser csvReader = new(FormMain.Config.InputFileName);
                 csvReader.SetDelimiters([","]);
                 csvReader.HasFieldsEnclosedInQuotes = true;
-                string[] colFields = csvReader.ReadFields();
-                foreach (string item in colFields)
+
+                // get column headers
+                while (!csvReader.EndOfData)
                 {
-                    DataColumn column = new(item);
-                    m_dataTable.Columns.Add(column);
+                    string[] colFields = csvReader.ReadFields();
+                    if ((colFields.Length < 1) || !colFields.Contains(ColumnMap.Lookup("Customer")))
+                    {
+                        m_logger("Skipping header line: starting with: " + colFields[0]);
+                        continue;
+                    }
+                    foreach (string item in colFields)
+                    {
+                        DataColumn column = new(item);
+                        m_dataTable.Columns.Add(column);
+                    }
+                    break;
                 }
+                // read data
                 while (!csvReader.EndOfData)
                 {
                     string[] fieldData = csvReader.ReadFields();
+                    if (fieldData.Length < 2 || string.IsNullOrEmpty(fieldData[1]))
+                    {
+                        // the footer has data in only the first field.
+                        m_logger("skipping line with not enough columns: " + fieldData[0]);
+                        continue;
+                    }
                     m_dataTable.Rows.Add(fieldData);
                 }
             }
@@ -64,6 +76,7 @@ namespace DonorStatement
                 return false;
             }
 
+            FileHasBeenRead = true;
             return true;
         } //end ParseInputFile
 
@@ -94,32 +107,26 @@ namespace DonorStatement
 
         public void GetItemList(out List<string> items)
         {
-            GetColumnContentsUnique("Name", out items);  // was Item
+            GetColumnContentsUnique(ColumnMap.Lookup("Product/Service"), out items);  // was Item
         }
 
         public void GetNameList(out List<string> names)
         {
-            GetColumnContentsUnique("Customer name", out names);  // was Name
+            GetColumnContentsUnique(ColumnMap.Lookup("Customer"), out names);  // was Name
         }
 
         public void GetDataForName(string name, out DataTable table)
         {
             // need to duplicate the single quote in a name  "O'Donald" -> "O''Donald"
-            string filter = string.Format("[Customer name] = '{0}'", name.Replace("'", "''")); 
-            DataRow[] rows = m_dataTable.Select(filter, "Date ASC");
+            string filter = string.Format("[Customer] = '{0}'", name.Replace("'", "''"));
+            string date = ColumnMap.Lookup("Date") + " ASC";
+            DataRow[] rows = m_dataTable.Select(filter, date);
 
             table = m_dataTable.Clone();
             foreach (DataRow row in rows)
             {
                 table.Rows.Add(row.ItemArray);
             }
-        }
-
-        public void GetColunmNames(out List<string> columNames)
-        {
-            columNames = [];
-            foreach (DataColumn col in m_dataTable.Columns)
-                columNames.Add(col.ColumnName);
         }
 
         public void Dispose()
@@ -137,7 +144,7 @@ namespace DonorStatement
             {
                 m_dataTable.Dispose();
             }
-            
+
             m_disposed = true;
         }
     } // end class FileParser

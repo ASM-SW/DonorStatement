@@ -1,5 +1,5 @@
-﻿// Copyright © 2016-2019 ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2016-2024 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -58,7 +58,7 @@ namespace DonorStatement
             for (int i = 0; i < FormMain.Config.ItemListNotSelected.Count; i++)
             {
                 if (itemListFromFile.BinarySearch(FormMain.Config.ItemListNotSelected[i]) < 0)
-                    indexItemsToRemove.Insert(0, i);  
+                    indexItemsToRemove.Insert(0, i);
             }
             // The iteration and remove is working because theindexItemsToRemove is automatically reverse sorted by inserting at the beginning, see above
             foreach (int item in indexItemsToRemove)

@@ -1,5 +1,5 @@
-﻿// Copyright © 2018  ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2018-2024 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

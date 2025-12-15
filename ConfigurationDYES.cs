@@ -1,18 +1,12 @@
-﻿// Copyright © 2016-2018  ASM-SW
-// asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2016-2024 ASM-SW
+// asm-sw@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Xml.Serialization;
 
 namespace DonorStatement
 {
- 
-
     /// <summary>
     /// ConfigurationDYES class contains all of the configuration information for generating the donor reports.  
     /// It may be saved and read in from file between runs.
@@ -34,9 +28,9 @@ namespace DonorStatement
 
         public ConfigurationDYES()
         {
-            ItemListSelected = new List<string>();
-            ItemListNotSelected = new List<string>();
-            ItemListIgnore = new List<string>();
+            ItemListSelected = [];
+            ItemListNotSelected = [];
+            ItemListIgnore = [];
             OutputFileListFileName = "1FileList.csv";
             ReportOtherPayments = false;
 
@@ -52,15 +46,13 @@ namespace DonorStatement
         {
             try
             {
-                using (TextWriter writer = new StreamWriter(fileName))
-                {
-                    XmlSerializer ser = new XmlSerializer(typeof(ConfigurationDYES));
-                    ser.Serialize(writer, this);
-                }
+                using TextWriter writer = new StreamWriter(fileName);
+                XmlSerializer ser = new(typeof(ConfigurationDYES));
+                ser.Serialize(writer, this);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.ToString());
+                FormMain.MessageBoxError(ex.ToString());
             }
             return true;
         }
@@ -71,9 +63,9 @@ namespace DonorStatement
                 return true;
             try
             {
-                using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
+                using (FileStream fileStream = new(fileName, FileMode.Open))
                 {
-                    XmlSerializer ser = new XmlSerializer(typeof(ConfigurationDYES));
+                    XmlSerializer ser = new(typeof(ConfigurationDYES));
                     cfg = (ConfigurationDYES)ser.Deserialize(fileStream);
                 }
                 cfg.ItemListSelected.Sort();
@@ -81,7 +73,9 @@ namespace DonorStatement
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                string msg = string.Format("Unable to read config file:  {0}\n\n{1}", fileName, ex.ToString());
+                FormMain.MessageBoxError(msg);
+                return false;
             }
             return true;
         }

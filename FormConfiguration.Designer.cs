@@ -1,5 +1,5 @@
-﻿// Copyright © 2016  ASM-SW
-//asmeyers@outlook.com  https://github.com/asm-sw
+﻿// Copyright © 2016-2024 ASM-SW
+//asm-sw@outlook.com  https://github.com/asm-sw
 namespace DonorStatement
 {
     partial class FormConfiguration
@@ -59,7 +59,7 @@ namespace DonorStatement
             this.butInputFile.TabIndex = 0;
             this.butInputFile.Text = "Input File";
             this.butInputFile.UseVisualStyleBackColor = true;
-            this.butInputFile.Click += new System.EventHandler(this.butInputFile_Click);
+            this.butInputFile.Click += new System.EventHandler(this.ButInputFile_Click);
             // 
             // textInputFile
             // 
@@ -89,7 +89,7 @@ namespace DonorStatement
             this.butWordTemplate.TabIndex = 2;
             this.butWordTemplate.Text = "Word Template";
             this.butWordTemplate.UseVisualStyleBackColor = true;
-            this.butWordTemplate.Click += new System.EventHandler(this.butWordTemplate_Click);
+            this.butWordTemplate.Click += new System.EventHandler(this.ButWordTemplate_Click);
             // 
             // butOutputFolder
             // 
@@ -100,7 +100,7 @@ namespace DonorStatement
             this.butOutputFolder.TabIndex = 4;
             this.butOutputFolder.Text = "Output Folder";
             this.butOutputFolder.UseVisualStyleBackColor = true;
-            this.butOutputFolder.Click += new System.EventHandler(this.butOutputFolder_Click);
+            this.butOutputFolder.Click += new System.EventHandler(this.ButOutputFolder_Click);
             // 
             // textOutputDirectory
             // 
@@ -129,7 +129,7 @@ namespace DonorStatement
             this.textDateRange.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.textDateRange.Size = new System.Drawing.Size(696, 20);
             this.textDateRange.TabIndex = 8;
-            this.textDateRange.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.textDateRange.TextChanged += new System.EventHandler(this.TextBoxDateRange_TextChanged);
             // 
             // labelDateRange
             // 
@@ -149,7 +149,7 @@ namespace DonorStatement
             this.cbReportOtherPayments.TabIndex = 11;
             this.cbReportOtherPayments.Text = "Report non-donation in Other Payments table";
             this.cbReportOtherPayments.UseVisualStyleBackColor = true;
-            this.cbReportOtherPayments.CheckedChanged += new System.EventHandler(this.cbReportOtherPayments_CheckedChanged);
+            this.cbReportOtherPayments.CheckedChanged += new System.EventHandler(this.CbReportOtherPayments_CheckedChanged);
             // 
             // FormConfiguration
             // 
