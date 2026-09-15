@@ -4,15 +4,16 @@ using MessageBoxCenteredDll;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
 namespace DonorStatement
 {
-    public delegate void LogMessageDelegate(string msg);
+    internal delegate void LogMessageDelegate(string msg);
 
-    public partial class FormMain : Form
+    internal partial class FormMain : Form
     {
         private static Form MainForm { get; set; }
         public static Rectangle Rectangle
@@ -30,7 +31,7 @@ namespace DonorStatement
         public static MessageBoxCentered.ButtonTyp MessageBoxEx(string caption, string message, MessageBoxCentered.BoxType boxType) =>
             MessageBoxCentered.ShowDialog(Rectangle, caption, message, boxType);
 
-        public enum PanelNavDirection
+        internal enum PanelNavDirection
         {
             forward,
             backward
@@ -94,7 +95,7 @@ namespace DonorStatement
             labelProgress.Text = string.Empty;
             if (m_activeForm < 0)
                 return;
-            labelProgress.Text = string.Format("Step {0} of {1}", m_activeForm + 1, m_forms.Count);
+            labelProgress.Text = string.Format(CultureInfo.CurrentCulture, "Step {0} of {1}", m_activeForm + 1, m_forms.Count);
         }
 
         private bool SubFormOkToExit()
@@ -236,7 +237,7 @@ namespace DonorStatement
 
         private void ButtonAbout_Click(object sender, EventArgs e)
         {
-            AboutBox1 aboutBox = new(this);
+            using AboutBox1 aboutBox = new(this);
             aboutBox.ShowDialog();
         }
 

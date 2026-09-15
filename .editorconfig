@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# IDE0055: Fix formatting
+#dotnet_diagnostic.IDE0055.severity = none
+dotnet_diagnostic.CA1031.severity = none # exception handling rule
+dotnet_diagnostic.CA1303.severity = none # literal string should be in resource file
+dotnet_diagnostic.CA1805.severity = none # setting default value to variable

@@ -3,9 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.IO.Pipes;
 using System.Reflection;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace DonorStatement
@@ -14,11 +17,11 @@ namespace DonorStatement
     /// This static class provides functionality us to look up column mappings
     /// loaded from an external XML file.  The Lookup method is multi-thread safe.
     /// </summary>
-    public static class ColumnMap
+    internal static class ColumnMap
     {
         private static Dictionary<string, string> m_Mappings { get; set; } = [];
         private static readonly System.Threading.Lock m_lock = new();
-        private static LogMessageDelegate m_logger = null;
+        private static LogMessageDelegate m_logger;
 
         public static void SetLogger(LogMessageDelegate logger)
         {
@@ -74,7 +77,7 @@ namespace DonorStatement
                 {
                     if (cnt++ > 0)
                         msg.Append(", ");
-                    msg.AppendFormat(" \"{0}\"", mapping.Value);
+                    msg.AppendFormat(CultureInfo.CurrentCulture, " \"{0}\"", mapping.Value);
                 }
             }
             if (cnt > 0)
@@ -90,7 +93,7 @@ namespace DonorStatement
 
 
     [Serializable]
-    public class ColumnMappings
+    internal class ColumnMappings
     {
         [XmlArray("Mappings")]
         [XmlArrayItem("Mapping")]
@@ -121,12 +124,14 @@ namespace DonorStatement
         {
             if (!File.Exists(fileName))
                 return new ColumnMappings();
+
             try
             {
                 using FileStream fileStream = new(fileName, FileMode.Open);
-                XmlSerializer ser = new(typeof(ColumnMappings));
-                return (ColumnMappings)ser.Deserialize(fileStream);
-            }
+                using XmlReader reader = XmlReader.Create(fileStream);
+                ColumnMappings mappings = (ColumnMappings)new XmlSerializer(typeof(ColumnMappings)).Deserialize(reader);
+                return mappings;
+}
             catch (Exception ex)
             {
                 string msg = $"Unable to read column mappings file: {fileName}\n\n{ex}";
@@ -137,7 +142,7 @@ namespace DonorStatement
     }
 
     [Serializable]
-    public class Mapping
+    internal class Mapping
     {
         public string Key { get; set; }
         public string Value { get; set; }

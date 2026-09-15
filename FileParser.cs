@@ -4,16 +4,17 @@ using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 
 namespace DonorStatement
 {
-    public partial class FileParser : IDisposable
+    internal partial class FileParser : IDisposable
     {
         readonly LogMessageDelegate m_logger;
         DataTable m_dataTable = new();
         public bool FileHasBeenRead { get; set; }
-        bool m_disposed = false;
+        bool m_disposed;
 
         public FileParser(LogMessageDelegate logger)
         {
@@ -90,7 +91,7 @@ namespace DonorStatement
         private void GetColumnContentsUnique(string columnName, out List<string> items)
         {
             items = [];
-            DataView view = new(m_dataTable)
+            using DataView view = new(m_dataTable)
             {
                 Sort = columnName
             };
@@ -118,7 +119,7 @@ namespace DonorStatement
         public void GetDataForName(string name, out DataTable table)
         {
             // need to duplicate the single quote in a name  "O'Donald" -> "O''Donald"
-            string filter = string.Format("[Customer] = '{0}'", name.Replace("'", "''"));
+            string filter = string.Format(CultureInfo.CurrentCulture, "[Customer] = '{0}'", name.Replace("'", "''", StringComparison.OrdinalIgnoreCase));
             string date = ColumnMap.Lookup("Date") + " ASC";
             DataRow[] rows = m_dataTable.Select(filter, date);
 

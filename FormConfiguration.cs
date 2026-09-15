@@ -15,7 +15,7 @@ namespace DonorStatement
             InitializeComponent();
 
             textInputFile.Text = FormMain.Config.InputFileName;
-            textWordTemplate.Text = FormMain.Config.WordTemplateFileName;
+            textWordTemplate.Text = FormMain.Config.PdfTemplateFile;
             textOutputDirectory.Text = FormMain.Config.OutputDirectory;
             textConfigFile.Text = "Configuration file: " + FormMain.Config.ConfigFileName;
             textDateRange.Text = FormMain.Config.DateRange;
@@ -52,8 +52,8 @@ namespace DonorStatement
             string fileName = textWordTemplate.Text;
             if (SelectFile(ref fileName, "Word templated file|*.dotx|All Files|*.*"))
             {
-                FormMain.Config.WordTemplateFileName = fileName;
-                textWordTemplate.Text = FormMain.Config.WordTemplateFileName;
+                FormMain.Config.PdfTemplateFile = fileName;
+                textWordTemplate.Text = FormMain.Config.PdfTemplateFile;
             }
         }
 
@@ -93,13 +93,13 @@ namespace DonorStatement
             FormMain.Config.OutputDirectory = textOutputDirectory.Text.Trim();
             FormMain.Config.DateRange = textDateRange.Text.Trim();
             FormMain.Config.InputFileName = textInputFile.Text.Trim();
-            FormMain.Config.WordTemplateFileName = textWordTemplate.Text.Trim();
+            FormMain.Config.PdfTemplateFile = textWordTemplate.Text.Trim();
 
             bool res = true;
             StringBuilder msg = new("Errors in Configuration: \n");
 
             if (FormMain.Config.InputFileName.StartsWith(FormMain.Config.OutputDirectory) || 
-                FormMain.Config.WordTemplateFileName.StartsWith(FormMain.Config.OutputDirectory))
+                FormMain.Config.PdfTemplateFile.StartsWith(FormMain.Config.OutputDirectory))
             {
                 msg.AppendFormat("- Input file and Word template file, cannot be in the output directory\n");
                 res = false;
@@ -112,9 +112,9 @@ namespace DonorStatement
                 res = false;
             }
            
-            if(!File.Exists(FormMain.Config.WordTemplateFileName))
+            if(!File.Exists(FormMain.Config.PdfTemplateFile))
             {
-                msg.AppendFormat("- Word template file does not exist: {0}\n", FormMain.Config.WordTemplateFileName);
+                msg.AppendFormat("- Word template file does not exist: {0}\n", FormMain.Config.PdfTemplateFile);
                 res = false;
             }
 

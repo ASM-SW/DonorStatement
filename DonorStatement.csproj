@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
@@ -20,8 +20,16 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>True</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <WarningLevel>9999</WarningLevel>
+    <LangVersion>latestmajor</LangVersion>
+    <NoWarn>CA1416</NoWarn>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <Deterministic>False</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <WarningLevel>9999</WarningLevel>
     <LangVersion>latestmajor</LangVersion>
     <NoWarn>CA1416</NoWarn>
@@ -36,6 +44,18 @@
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <WarningLevel>9999</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
+    <LangVersion>latestmajor</LangVersion>
+    <NoWarn>CA1416</NoWarn>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <Deterministic>False</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+  </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
@@ -45,6 +65,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="DocumentCreator.cs.orig" />
+    <None Remove="DocumentCreator.cs.xxx" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="AMovie">
@@ -97,6 +118,10 @@
     <Content Include="icon.ico" />
     <Content Include="License.txt" />
     <Content Include="notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ASM-SW.PdfCreator" Version="1.0.1" />
+    <PackageReference Include="QuestPDF" Version="2026.8.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MessageBoxCenteredDll\MessageBoxCenteredDll.csproj" />

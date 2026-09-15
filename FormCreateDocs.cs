@@ -4,12 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace DonorStatement
 {
-    public partial class FormCreateDocs : Form
+    internal partial class FormCreateDocs : Form
     {
         readonly FileParser m_parser;
         readonly DocumentCreator m_docCreator;
@@ -43,8 +44,8 @@ namespace DonorStatement
 
         private void BackgroundWork()
         {
-            m_logger(string.Format("Start: {0}", DateTimeOffset.Now.ToString("HH:mm:ss")));
-            if(!m_docCreator.CreateDoc())
+            m_logger(string.Format(CultureInfo.CurrentCulture, "Start: {0}", DateTimeOffset.Now.ToString("HH:mm:ss", CultureInfo.CurrentCulture)));
+            if(!m_docCreator.DocumentCreatorInit())
             {
                 m_docCreator.CreateDocsDone();
                 EnableButtons();
@@ -61,7 +62,6 @@ namespace DonorStatement
                 EnableButtons();
                 return;
             }
-            m_docCreator.CheckForBookmarksAndTables();
 
             m_parser.GetNameList(out List<string> names);
 
@@ -69,7 +69,7 @@ namespace DonorStatement
             {
                 if (m_CancelPending)
                 {
-                    m_logger(string.Format("User canceled the program.  {0} of {1} documents completed", i, names.Count));
+                    m_logger(string.Format(CultureInfo.CurrentCulture, "User canceled the program.  {0} of {1} documents completed", i, names.Count));
                     UpdateUI(0, 0);
                     break;
                 }
@@ -80,7 +80,7 @@ namespace DonorStatement
             m_CancelPending = false;
             m_docCreator.CreateDocsDone();
             m_docCreator.SaveFileList();
-            m_logger(string.Format("Finish: {0}", DateTimeOffset.Now.ToString("HH:mm:ss")));
+            m_logger(string.Format(CultureInfo.CurrentCulture,"Finish: {0}", DateTimeOffset.Now.ToString("HH:mm:ss", CultureInfo.CurrentCulture)));
             EnableButtons();
         }
 
@@ -110,7 +110,7 @@ namespace DonorStatement
             }
             else
             {
-                labelProgress.Text = string.Format("Step {0} of {1}", step, totalSteps);
+                labelProgress.Text = string.Format(CultureInfo.CurrentCulture, "Step {0} of {1}", step, totalSteps);
                 progressBar1.Value = (int)((float)step / (float)totalSteps * 100.0);
             }
         }
