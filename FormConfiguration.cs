@@ -1,6 +1,7 @@
 ﻿// Copyright © 2016-2024 ASM-SW
 //asm-sw@outlook.com  https://github.com/asm-sw
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -47,10 +48,10 @@ namespace DonorStatement
             }
         }
 
-        private void ButWordTemplate_Click(object sender, EventArgs e)
+        private void ButLetterTemplate_Click(object sender, EventArgs e)
         {
             string fileName = textWordTemplate.Text;
-            if (SelectFile(ref fileName, "Word templated file|*.dotx|All Files|*.*"))
+            if (SelectFile(ref fileName, "Json templated file|*.json|All Files|*.*"))
             {
                 FormMain.Config.PdfTemplateFile = fileName;
                 textWordTemplate.Text = FormMain.Config.PdfTemplateFile;
@@ -98,29 +99,29 @@ namespace DonorStatement
             bool res = true;
             StringBuilder msg = new("Errors in Configuration: \n");
 
-            if (FormMain.Config.InputFileName.StartsWith(FormMain.Config.OutputDirectory) || 
-                FormMain.Config.PdfTemplateFile.StartsWith(FormMain.Config.OutputDirectory))
+            if (FormMain.Config.InputFileName.StartsWith(FormMain.Config.OutputDirectory, StringComparison.CurrentCulture) || 
+                FormMain.Config.PdfTemplateFile.StartsWith(FormMain.Config.OutputDirectory, StringComparison.CurrentCulture))
             {
-                msg.AppendFormat("- Input file and Word template file, cannot be in the output directory\n");
+                msg.AppendFormat(CultureInfo.CurrentCulture, "- Input file and Word template file, cannot be in the output directory\n");
                 res = false;
             }
                         
             FormMain.Config.InputFileName = textInputFile.Text;
             if(!File.Exists(FormMain.Config.InputFileName))
             {
-                msg.AppendFormat("- Input file does not exist: {0}\n", FormMain.Config.InputFileName);
+                msg.AppendFormat(CultureInfo.CurrentCulture, "- Input file does not exist: {0}\n", FormMain.Config.InputFileName);
                 res = false;
             }
            
             if(!File.Exists(FormMain.Config.PdfTemplateFile))
             {
-                msg.AppendFormat("- Word template file does not exist: {0}\n", FormMain.Config.PdfTemplateFile);
+                msg.AppendFormat(CultureInfo.CurrentCulture, "- Word template file does not exist: {0}\n", FormMain.Config.PdfTemplateFile);
                 res = false;
             }
 
             if(!Directory.Exists(FormMain.Config.OutputDirectory))
             {
-                msg.AppendFormat("- Output Directory does not exist: {0}\n", FormMain.Config.OutputDirectory);
+                msg.AppendFormat(CultureInfo.CurrentCulture, "- Output Directory does not exist: {0}\n", FormMain.Config.OutputDirectory);
                 res = false;
             }
 

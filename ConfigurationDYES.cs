@@ -2,7 +2,10 @@
 // asm-sw@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Windows.Forms;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace DonorStatement
@@ -16,7 +19,6 @@ namespace DonorStatement
     {
         public string OutputDirectory { get; set; }             // directory where all of the output files will be saved
         public string PdfTemplateFile { get; set; }            // PDF template file for the donation statement
-        public string WordTemplateFileName { get; set; }          // todo remove
         public string InputFileName { get; set; }               // Name of input CSV file; Sale report from QuickBooks
         public string OutputFileListFileName { get; set; }      // CSV file that contains the list of statements
         public string DateRange { get; set; }                   // Date range in statement:  Jan 1, 2015 through December 31, 2015
@@ -64,18 +66,17 @@ namespace DonorStatement
                 return true;
             try
             {
-                using (FileStream fileStream = new(fileName, FileMode.Open))
-                {
-                    XmlSerializer ser = new(typeof(ConfigurationDYES));
-                    cfg = (ConfigurationDYES)ser.Deserialize(fileStream);
-                }
+                XmlSerializer ser = new(typeof(ConfigurationDYES));
+                using FileStream fs = new(fileName, FileMode.Open);
+                using XmlReader reader = XmlReader.Create(fs);
+                cfg = (ConfigurationDYES)ser.Deserialize(reader);
                 cfg.ItemListSelected.Sort();
                 cfg.ItemListIgnore.Sort();
             }
             catch (Exception ex)
             {
-                string msg = string.Format("Unable to read config file:  {0}\n\n{1}", fileName, ex.ToString());
-                FormMain.MessageBoxError(msg);
+                string msg = string.Format(CultureInfo.CurrentCulture, "Unable to read config file:  {0}\n\n{1}", fileName, ex.ToString());
+                MessageBox.Show(msg); // too early to use FormMain.MessageBoxError() since FormMain may not be initialized yet
                 return false;
             }
             return true;

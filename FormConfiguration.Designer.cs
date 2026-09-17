@@ -30,153 +30,155 @@ namespace DonorStatement
         /// </summary>
         private void InitializeComponent()
         {
-            this.fileDlgInputFile = new System.Windows.Forms.OpenFileDialog();
-            this.butInputFile = new System.Windows.Forms.Button();
-            this.textInputFile = new System.Windows.Forms.TextBox();
-            this.textWordTemplate = new System.Windows.Forms.TextBox();
-            this.butWordTemplate = new System.Windows.Forms.Button();
-            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.butOutputFolder = new System.Windows.Forms.Button();
-            this.textOutputDirectory = new System.Windows.Forms.TextBox();
-            this.textConfigFile = new System.Windows.Forms.TextBox();
-            this.textDateRange = new System.Windows.Forms.TextBox();
-            this.labelDateRange = new System.Windows.Forms.Label();
-            this.cbReportOtherPayments = new System.Windows.Forms.CheckBox();
-            this.SuspendLayout();
+            fileDlgInputFile = new System.Windows.Forms.OpenFileDialog();
+            butInputFile = new System.Windows.Forms.Button();
+            textInputFile = new System.Windows.Forms.TextBox();
+            textWordTemplate = new System.Windows.Forms.TextBox();
+            ButLetterTemplate = new System.Windows.Forms.Button();
+            folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            butOutputFolder = new System.Windows.Forms.Button();
+            textOutputDirectory = new System.Windows.Forms.TextBox();
+            textConfigFile = new System.Windows.Forms.TextBox();
+            textDateRange = new System.Windows.Forms.TextBox();
+            labelDateRange = new System.Windows.Forms.Label();
+            cbReportOtherPayments = new System.Windows.Forms.CheckBox();
+            SuspendLayout();
             // 
             // fileDlgInputFile
             // 
-            this.fileDlgInputFile.Filter = "comma seperated files|*.csv";
-            this.fileDlgInputFile.Title = "Select Input File";
+            fileDlgInputFile.Filter = "comma seperated files|*.csv";
+            fileDlgInputFile.Title = "Select Input File";
             // 
             // butInputFile
             // 
-            this.butInputFile.AutoSize = true;
-            this.butInputFile.Location = new System.Drawing.Point(32, 8);
-            this.butInputFile.Margin = new System.Windows.Forms.Padding(2);
-            this.butInputFile.Name = "butInputFile";
-            this.butInputFile.Size = new System.Drawing.Size(60, 23);
-            this.butInputFile.TabIndex = 0;
-            this.butInputFile.Text = "Input File";
-            this.butInputFile.UseVisualStyleBackColor = true;
-            this.butInputFile.Click += new System.EventHandler(this.ButInputFile_Click);
+            butInputFile.AutoSize = true;
+            butInputFile.Location = new System.Drawing.Point(37, 9);
+            butInputFile.Margin = new System.Windows.Forms.Padding(2);
+            butInputFile.Name = "butInputFile";
+            butInputFile.Size = new System.Drawing.Size(70, 27);
+            butInputFile.TabIndex = 0;
+            butInputFile.Text = "Input File";
+            butInputFile.UseVisualStyleBackColor = true;
+            butInputFile.Click += ButInputFile_Click;
             // 
             // textInputFile
             // 
-            this.textInputFile.Location = new System.Drawing.Point(101, 8);
-            this.textInputFile.Margin = new System.Windows.Forms.Padding(2);
-            this.textInputFile.Name = "textInputFile";
-            this.textInputFile.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textInputFile.Size = new System.Drawing.Size(696, 20);
-            this.textInputFile.TabIndex = 1;
+            textInputFile.Location = new System.Drawing.Point(118, 9);
+            textInputFile.Margin = new System.Windows.Forms.Padding(2);
+            textInputFile.Name = "textInputFile";
+            textInputFile.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            textInputFile.Size = new System.Drawing.Size(811, 23);
+            textInputFile.TabIndex = 1;
             // 
             // textWordTemplate
             // 
-            this.textWordTemplate.Location = new System.Drawing.Point(101, 41);
-            this.textWordTemplate.Margin = new System.Windows.Forms.Padding(2);
-            this.textWordTemplate.Name = "textWordTemplate";
-            this.textWordTemplate.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textWordTemplate.Size = new System.Drawing.Size(696, 20);
-            this.textWordTemplate.TabIndex = 3;
+            textWordTemplate.Location = new System.Drawing.Point(118, 47);
+            textWordTemplate.Margin = new System.Windows.Forms.Padding(2);
+            textWordTemplate.Name = "textWordTemplate";
+            textWordTemplate.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            textWordTemplate.Size = new System.Drawing.Size(811, 23);
+            textWordTemplate.TabIndex = 3;
             // 
-            // butWordTemplate
+            // ButLetterTemplate
             // 
-            this.butWordTemplate.AutoSize = true;
-            this.butWordTemplate.Location = new System.Drawing.Point(2, 39);
-            this.butWordTemplate.Margin = new System.Windows.Forms.Padding(2);
-            this.butWordTemplate.Name = "butWordTemplate";
-            this.butWordTemplate.Size = new System.Drawing.Size(90, 23);
-            this.butWordTemplate.TabIndex = 2;
-            this.butWordTemplate.Text = "Word Template";
-            this.butWordTemplate.UseVisualStyleBackColor = true;
-            this.butWordTemplate.Click += new System.EventHandler(this.ButWordTemplate_Click);
+            ButLetterTemplate.AutoSize = true;
+            ButLetterTemplate.Location = new System.Drawing.Point(2, 45);
+            ButLetterTemplate.Margin = new System.Windows.Forms.Padding(2);
+            ButLetterTemplate.Name = "ButLetterTemplate";
+            ButLetterTemplate.Size = new System.Drawing.Size(105, 27);
+            ButLetterTemplate.TabIndex = 2;
+            ButLetterTemplate.Text = "Letter Template";
+            ButLetterTemplate.UseVisualStyleBackColor = true;
+            ButLetterTemplate.Click += ButLetterTemplate_Click;
             // 
             // butOutputFolder
             // 
-            this.butOutputFolder.Location = new System.Drawing.Point(14, 74);
-            this.butOutputFolder.Margin = new System.Windows.Forms.Padding(2);
-            this.butOutputFolder.Name = "butOutputFolder";
-            this.butOutputFolder.Size = new System.Drawing.Size(78, 21);
-            this.butOutputFolder.TabIndex = 4;
-            this.butOutputFolder.Text = "Output Folder";
-            this.butOutputFolder.UseVisualStyleBackColor = true;
-            this.butOutputFolder.Click += new System.EventHandler(this.ButOutputFolder_Click);
+            butOutputFolder.Location = new System.Drawing.Point(16, 85);
+            butOutputFolder.Margin = new System.Windows.Forms.Padding(2);
+            butOutputFolder.Name = "butOutputFolder";
+            butOutputFolder.Size = new System.Drawing.Size(91, 24);
+            butOutputFolder.TabIndex = 4;
+            butOutputFolder.Text = "Output Folder";
+            butOutputFolder.UseVisualStyleBackColor = true;
+            butOutputFolder.Click += ButOutputFolder_Click;
             // 
             // textOutputDirectory
             // 
-            this.textOutputDirectory.Location = new System.Drawing.Point(101, 74);
-            this.textOutputDirectory.Margin = new System.Windows.Forms.Padding(2);
-            this.textOutputDirectory.Name = "textOutputDirectory";
-            this.textOutputDirectory.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textOutputDirectory.Size = new System.Drawing.Size(696, 20);
-            this.textOutputDirectory.TabIndex = 5;
+            textOutputDirectory.Location = new System.Drawing.Point(118, 85);
+            textOutputDirectory.Margin = new System.Windows.Forms.Padding(2);
+            textOutputDirectory.Name = "textOutputDirectory";
+            textOutputDirectory.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            textOutputDirectory.Size = new System.Drawing.Size(811, 23);
+            textOutputDirectory.TabIndex = 5;
             // 
             // textConfigFile
             // 
-            this.textConfigFile.Enabled = false;
-            this.textConfigFile.Location = new System.Drawing.Point(-2, 242);
-            this.textConfigFile.Margin = new System.Windows.Forms.Padding(2);
-            this.textConfigFile.Name = "textConfigFile";
-            this.textConfigFile.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textConfigFile.Size = new System.Drawing.Size(781, 20);
-            this.textConfigFile.TabIndex = 6;
+            textConfigFile.Enabled = false;
+            textConfigFile.Location = new System.Drawing.Point(-2, 279);
+            textConfigFile.Margin = new System.Windows.Forms.Padding(2);
+            textConfigFile.Name = "textConfigFile";
+            textConfigFile.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            textConfigFile.Size = new System.Drawing.Size(910, 23);
+            textConfigFile.TabIndex = 6;
             // 
             // textDateRange
             // 
-            this.textDateRange.Location = new System.Drawing.Point(101, 110);
-            this.textDateRange.Margin = new System.Windows.Forms.Padding(2);
-            this.textDateRange.Name = "textDateRange";
-            this.textDateRange.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textDateRange.Size = new System.Drawing.Size(696, 20);
-            this.textDateRange.TabIndex = 8;
-            this.textDateRange.TextChanged += new System.EventHandler(this.TextBoxDateRange_TextChanged);
+            textDateRange.Location = new System.Drawing.Point(118, 127);
+            textDateRange.Margin = new System.Windows.Forms.Padding(2);
+            textDateRange.Name = "textDateRange";
+            textDateRange.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            textDateRange.Size = new System.Drawing.Size(811, 23);
+            textDateRange.TabIndex = 8;
+            textDateRange.TextChanged += TextBoxDateRange_TextChanged;
             // 
             // labelDateRange
             // 
-            this.labelDateRange.AutoSize = true;
-            this.labelDateRange.Location = new System.Drawing.Point(27, 113);
-            this.labelDateRange.Name = "labelDateRange";
-            this.labelDateRange.Size = new System.Drawing.Size(65, 13);
-            this.labelDateRange.TabIndex = 10;
-            this.labelDateRange.Text = "Date Range";
+            labelDateRange.AutoSize = true;
+            labelDateRange.Location = new System.Drawing.Point(31, 130);
+            labelDateRange.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            labelDateRange.Name = "labelDateRange";
+            labelDateRange.Size = new System.Drawing.Size(67, 15);
+            labelDateRange.TabIndex = 10;
+            labelDateRange.Text = "Date Range";
             // 
             // cbReportOtherPayments
             // 
-            this.cbReportOtherPayments.AutoSize = true;
-            this.cbReportOtherPayments.Location = new System.Drawing.Point(101, 161);
-            this.cbReportOtherPayments.Name = "cbReportOtherPayments";
-            this.cbReportOtherPayments.Size = new System.Drawing.Size(238, 17);
-            this.cbReportOtherPayments.TabIndex = 11;
-            this.cbReportOtherPayments.Text = "Report non-donation in Other Payments table";
-            this.cbReportOtherPayments.UseVisualStyleBackColor = true;
-            this.cbReportOtherPayments.CheckedChanged += new System.EventHandler(this.CbReportOtherPayments_CheckedChanged);
+            cbReportOtherPayments.AutoSize = true;
+            cbReportOtherPayments.Location = new System.Drawing.Point(118, 186);
+            cbReportOtherPayments.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            cbReportOtherPayments.Name = "cbReportOtherPayments";
+            cbReportOtherPayments.Size = new System.Drawing.Size(268, 19);
+            cbReportOtherPayments.TabIndex = 11;
+            cbReportOtherPayments.Text = "Report non-donation in Other Payments table";
+            cbReportOtherPayments.UseVisualStyleBackColor = true;
+            cbReportOtherPayments.CheckedChanged += CbReportOtherPayments_CheckedChanged;
             // 
             // FormConfiguration
             // 
-            this.AccessibleDescription = "Fill in the following items:";
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(808, 273);
-            this.ControlBox = false;
-            this.Controls.Add(this.cbReportOtherPayments);
-            this.Controls.Add(this.labelDateRange);
-            this.Controls.Add(this.textDateRange);
-            this.Controls.Add(this.textConfigFile);
-            this.Controls.Add(this.textOutputDirectory);
-            this.Controls.Add(this.butOutputFolder);
-            this.Controls.Add(this.textWordTemplate);
-            this.Controls.Add(this.butWordTemplate);
-            this.Controls.Add(this.textInputFile);
-            this.Controls.Add(this.butInputFile);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "FormConfiguration";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
-            this.Text = "ConfigurationForm";
-            this.VisibleChanged += new System.EventHandler(this.FormConfiguration_VisibleChanged);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AccessibleDescription = "Fill in the following items:";
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(943, 315);
+            ControlBox = false;
+            Controls.Add(cbReportOtherPayments);
+            Controls.Add(labelDateRange);
+            Controls.Add(textDateRange);
+            Controls.Add(textConfigFile);
+            Controls.Add(textOutputDirectory);
+            Controls.Add(butOutputFolder);
+            Controls.Add(textWordTemplate);
+            Controls.Add(ButLetterTemplate);
+            Controls.Add(textInputFile);
+            Controls.Add(butInputFile);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            Margin = new System.Windows.Forms.Padding(2);
+            Name = "FormConfiguration";
+            ShowIcon = false;
+            ShowInTaskbar = false;
+            Text = "ConfigurationForm";
+            VisibleChanged += FormConfiguration_VisibleChanged;
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -186,7 +188,7 @@ namespace DonorStatement
         private System.Windows.Forms.Button butInputFile;
         private System.Windows.Forms.TextBox textInputFile;
         private System.Windows.Forms.TextBox textWordTemplate;
-        private System.Windows.Forms.Button butWordTemplate;
+        private System.Windows.Forms.Button ButLetterTemplate;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.Button butOutputFolder;
         private System.Windows.Forms.TextBox textOutputDirectory;

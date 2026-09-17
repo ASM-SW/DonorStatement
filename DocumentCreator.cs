@@ -5,6 +5,7 @@ using MessageBoxCenteredDll;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -16,7 +17,7 @@ namespace DonorStatement
     /// <summary>
     /// Class to contain one donor.  This is put into a list and serialized out to a csv file in DocumentCreatorQPdf.SaveFilesList().
     /// </summary>
-    internal class DonorRecordQPdf
+    internal sealed class DonorRecordQPdf
     {
         public DonorRecordQPdf(string name, string fileName, string email, string nameLastFirst)
         {
@@ -36,7 +37,7 @@ namespace DonorStatement
     /// <summary>
     /// Class to contain a table name and its index within the template.
     /// </summary>
-    internal class TableInfo
+    internal sealed class TableInfo
     {
         internal TableInfo(string tableName, int index)
         {
@@ -52,7 +53,7 @@ namespace DonorStatement
     }
 
     // this class handles creating, updating and saving the document
-    internal class DocumentCreator
+    internal sealed class DocumentCreator
     {
         private readonly LogMessageDelegate m_logger;
         private readonly List<DonorRecordQPdf> m_Files = [];
@@ -63,19 +64,29 @@ namespace DonorStatement
         // They will be replaced with the values from the data table.  
         private static readonly List<string> m_requiredPlaceHolders =
         [
-            "«Name»",
-            "«StatementDate»",
-            "«ToAddress»",
+            "«Billing_city»",
+            "«Billing_state»",
+            "«Billing_street»",
+            "«Billing_zip_code»",
+            "«Full_name»",
             "«YearDateRange»",
-            "«Total»",
         ];
+
+        // these are the column numbers for the columns in the data table that are required to be present.
+        private int m_idxAmount = -1;
+        private int m_idxBilling_city = -1;
+        private int m_idxBilling_state = -1;
+        private int m_idxBilling_street = -1;
+        private int m_idxBilling_zip_code = -1;
+        private int m_idxCustomer = -1;
+        private int m_idxDate = -1;
+        private int m_idxDescription = -1;
+        private int m_idxEmail = -1;
+        private int m_idxProduct_Service = -1;
+
 
         private TableInfo m_DonationTable = new TableInfo("DonationTable", -1);
         private TableInfo m_OtherPaymentsTable = new TableInfo("OtherPaymentsTable", -1);
-        int m_colDate = -1;
-        int m_colItem = -1;
-        int m_colDescription = -1;
-        int m_colAmount = -1;
 
         public DocumentCreator(LogMessageDelegate logger)
         {
@@ -87,11 +98,9 @@ namespace DonorStatement
         // If any of the checks fail, return false and do not continue.
         public bool DocumentCreatorInit()
         {
-            if (!InitTemplate(out string templateText))
+            if (!ReadAndParseLetterTemplate(out string templateText))
                 return false;
             if (!CheckTemplate(templateText))
-                return false;
-            if (!GetTemplateInfo())
                 return false;
 
             if (string.IsNullOrWhiteSpace(FormMain.Config.OutputDirectory))
@@ -127,7 +136,7 @@ namespace DonorStatement
             return true;
         }
 
-        private bool InitTemplate(out string templateText)
+        private bool ReadAndParseLetterTemplate(out string templateText)
         {
             templateText = string.Empty;
             if (string.IsNullOrWhiteSpace(FormMain.Config.PdfTemplateFile))
@@ -176,9 +185,9 @@ namespace DonorStatement
                 else if (m_template.Blocks[i].Id == m_OtherPaymentsTable.TableName)
                     m_OtherPaymentsTable.Index = i;
             }
-            if(m_DonationTable.Index < 0)
+            if (m_DonationTable.Index < 0)
                 m_logger("DonationTable not found in template");
-            if(m_OtherPaymentsTable.Index < 0)
+            if (m_OtherPaymentsTable.Index < 0)
                 m_logger("OtherPaymentsTable not found in template");
             bool isOk = m_DonationTable.Index >= 0 && m_OtherPaymentsTable.Index >= 0;
             StringBuilder msg = new();
@@ -192,32 +201,50 @@ namespace DonorStatement
                 isOk = false;
                 msg.Append(CultureInfo.CurrentCulture, $"Table Missing: {m_OtherPaymentsTable.TableName} ");
             }
-            if (isOk)
-            {
-                // find column numbers
-                m_colDate = m_template.Blocks[m_DonationTable.Index].Columns.FindIndex(c => c.Header == ColumnMap.Lookup("Date"));
-                m_colItem = m_template.Blocks[m_DonationTable.Index].Columns.FindIndex(c => c.Header == ColumnMap.Lookup("Product/Service"));
-                m_colDescription = m_template.Blocks[m_DonationTable.Index].Columns.FindIndex(c => c.Header == "Memo/Description");
-                m_colAmount = m_template.Blocks[m_DonationTable.Index].Columns.FindIndex(c => c.Header == ColumnMap.Lookup("Amount"));
-                if (m_colDate < 0 || m_colItem < 0 || m_colDescription < 0 || m_colAmount < 0)
-                {
-                    isOk = false;
-                    msg.Append("DonationTable missing columns, either in lookup or: ");
-                    if (m_colDate < 0)
-                        msg.Append(ColumnMap.Lookup("Date") + " ");
-                    if (m_colItem < 0)
-                        msg.Append(ColumnMap.Lookup("Product/Service") + " ");
-                    if (m_colDescription < 0)
-                        msg.Append("Memo/Description" + " ");
-                    if (m_colAmount < 0)
-                        msg.Append(ColumnMap.Lookup("Amount") + " ");
-                }
-            }
             if (!isOk)
             {
                 m_logger(msg.ToString());
                 FormMain.MessageBoxError(msg.ToString());
             }
+            return isOk;
+        }
+
+        // Get the column numbers for the columns in the data table that are required to be present.
+        public bool GetDataTableInfo(Dictionary<string, int> columnIndecies)
+        {
+            bool isOk = true;
+            m_idxAmount = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Amount"), -1);
+            m_idxBilling_city = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Billing city"), -1);
+            m_idxBilling_state = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Billing state"), -1);
+            m_idxBilling_street = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Billing street"), -1);
+            m_idxBilling_zip_code = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Billing zip code"), -1);
+            m_idxCustomer = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Customer"), -1);
+            m_idxDate = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Date"), -1);
+            m_idxDescription = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Description"), -1);
+            m_idxEmail = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Email"), -1);
+            m_idxProduct_Service = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Product/Service"), -1);
+
+            StringBuilder msg = new("Columns missing from input data: ");
+            if (m_idxAmount == -1) { isOk = false; msg.Append("Amount, "); }
+            if (m_idxBilling_city == -1) { isOk = false; msg.Append("Billing city, "); }
+            if (m_idxBilling_state == -1) { isOk = false; msg.Append("Billing state, "); }
+            if (m_idxBilling_street == -1) { isOk = false; msg.Append("Billing street, "); }
+            if (m_idxBilling_zip_code == -1) { isOk = false; msg.Append("Billing zip code, "); }
+            if (m_idxCustomer == -1) { isOk = false; msg.Append("Customer, "); }
+            if (m_idxDate == -1) { isOk = false; msg.Append("Date, "); }
+            if (m_idxDescription == -1) { isOk = false; msg.Append("Description, "); }
+            if (m_idxEmail == -1) { isOk = false; msg.Append("Email, "); }
+            if (m_idxProduct_Service == -1) { isOk = false; msg.Append("Product/Service, "); }
+
+            // Clean up trailing comma and space if any columns were missing
+            if (!isOk && msg.ToString().EndsWith(", ", StringComparison.InvariantCulture))
+                msg.Length -= 2;
+            if (!isOk)
+            {
+                m_logger(msg.ToString());
+                FormMain.MessageBoxError(msg.ToString());
+            }
+
             return isOk;
         }
 
@@ -241,6 +268,7 @@ namespace DonorStatement
             return isOk;
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Required by interface")]
         public void CreateDocsDone()
         {
             // No action needed for QuestPDF
@@ -274,32 +302,32 @@ namespace DonorStatement
                 last = last.TrimEnd('_');
                 customerName = string.Format(CultureInfo.CurrentCulture, "{0} {1}", first, last);
             }
-
-            //create a new document.
-            // create replacement values for the bookmarks
+            // create lookup dictionary for the placeholders in teh template.
+            //   fields.Add: PlaceHolder in the template, value to replace it with
             Dictionary<string, string> fields = [];
-            fields.Add("Name", customerName);
-            string date = DateTime.Now.ToString("M", CultureInfo.CurrentCulture) + ", " + DateTime.Now.ToString("yyyy", CultureInfo.CurrentCulture);
-            fields.Add("StatementDate", date);
-
-            // use the last row for the address, in case there was a change
-            int ndxLast = table.Rows.Count - 1;
-            StringBuilder builderToAddress = new();
-            builderToAddress.AppendLine(customerName);
-            builderToAddress.AppendLine(table.Rows[ndxLast][ColumnMap.Lookup("Billing street")].ToString());
-            StringBuilder stringBuilder = builderToAddress.AppendFormat(CultureInfo.CurrentCulture, "{0}, {1}  {2}", table.Rows[ndxLast][ColumnMap.Lookup("Billing city")].ToString(), table.Rows[ndxLast][ColumnMap.Lookup("Billing state")].ToString(), table.Rows[ndxLast][ColumnMap.Lookup("Billing zip code")].ToString());
-
-            fields.Add("ToAddress", builderToAddress.ToString());
+            fields.Add("Full_name", customerName);
             fields.Add("YearDateRange", FormMain.Config.DateRange);
+            fields.Add("Billing_street", table.Rows[0][m_idxBilling_street].ToString());
+            fields.Add("Billing_city", table.Rows[0][m_idxBilling_city].ToString());
+            fields.Add("Billing_state", table.Rows[0][m_idxBilling_state].ToString());
+            fields.Add("Billing_zip_code", table.Rows[0][m_idxBilling_zip_code].ToString());
+
 
             // used to convert numbers to strings
             const string formatNumberSmall = ",0.00";  // 1.12
             const string formatNumberLarge = "0,0.00"; // 123,456.78
 
+            // the following is a bit of a hack.  We should do a deep copy of the template.  But the only thing we 
+            // need to clean is the tables.  The placeholders are replaced during the PDF generation and are not modified in the template.
+            foreach (TableInfo tableInTemplate in new TableInfo[] { m_DonationTable, m_OtherPaymentsTable })
+            {
+                m_template.Blocks[tableInTemplate.Index].Rows.Clear();
+                tableInTemplate.Total = 0;
+            }
             // handle the table of donations and other payments
             foreach (DataRow row in table.Rows)
             {
-                string item = row[m_colItem].ToString();
+                string item = row[m_idxProduct_Service].ToString();
                 if (item == "--")
                     continue;
                 if (string.IsNullOrWhiteSpace(item))
@@ -314,11 +342,11 @@ namespace DonorStatement
                     isDonation = true;
                 RemoveDeletedFromString(ref item);
 
-                string itemDate = row[m_colDate].ToString();
-                string description = row[m_colDescription].ToString();
+                string itemDate = row[m_idxDate].ToString();
+                string description = row[m_idxDescription].ToString();
                 if (description == "--")
                     description = string.Empty;
-                string paid = row[m_colAmount].ToString();
+                string paid = row[m_idxAmount].ToString();
                 if (decimal.TryParse(paid, NumberStyles.Currency, CultureInfo.CurrentCulture, out decimal thisAmount))
                 {
                     if (isDonation)
@@ -342,15 +370,15 @@ namespace DonorStatement
             }
 
             // add summary row to the end of each table
-            foreach (TableInfo tableInfo in new TableInfo[] { m_DonationTable, m_OtherPaymentsTable })
+            foreach (TableInfo tableInTemplate in new TableInfo[] { m_DonationTable, m_OtherPaymentsTable })
             {
-                string amountString = tableInfo.Total.ToString(tableInfo.Total < 10 ? formatNumberSmall : formatNumberLarge, CultureInfo.InvariantCulture);
+                string amountString = tableInTemplate.Total.ToString(tableInTemplate.Total < 10 ? formatNumberSmall : formatNumberLarge, CultureInfo.InvariantCulture);
                 TableRow summary = new();
-                if (tableInfo.Total == 0)
+                if (tableInTemplate.Total == 0)
                     summary.Cells = [string.Empty, "None", string.Empty, string.Empty];
                 else
                     summary.Cells = [string.Empty, string.Empty, "Total Donations", amountString];
-                m_template.Blocks[tableInfo.Index].Rows.Add(summary);
+                m_template.Blocks[tableInTemplate.Index].Rows.Add(summary);
             }
 
 
@@ -374,13 +402,16 @@ namespace DonorStatement
             fileName = fileName.Replace('/', '-');
             fileName = fileName.Replace('\'', '_');
             fileName = fileName.Replace(" ", string.Empty, StringComparison.CurrentCulture);
-            fileName += ".pdf";
-            fileName = Path.Combine(FormMain.Config.OutputDirectory, fileName);
 
             // Generate letter modifies filename if there is a conflict
             string fullPath = LetterProcessor.GenerateLetter(m_template, fields, FormMain.Config.OutputDirectory, fileName);
             fileName = Path.GetFileName(fullPath);
-            DonorRecordQPdf donorRecord = new(customerName, fileName, email, nameLastFirst);
+            DonorRecordQPdf donorRecord = new(
+                    name: customerName,
+                    fileName: fileName,
+                    email: email,
+                    nameLastFirst: nameLastFirst
+                    );
             m_Files.Add(donorRecord);
         } // end CreateDoc
 
@@ -410,9 +441,9 @@ namespace DonorStatement
             }
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Required by interface")]
         public void Close()
         {
-            // No action needed for QuestPDF
         } // close
 
     }

@@ -9,7 +9,9 @@ using System.Linq;
 
 namespace DonorStatement
 {
+#pragma warning disable CA1852 // Dispose won't compile
     internal partial class FileParser : IDisposable
+#pragma warning restore CA1852
     {
         readonly LogMessageDelegate m_logger;
         DataTable m_dataTable = new();
@@ -128,6 +130,13 @@ namespace DonorStatement
             {
                 table.Rows.Add(row.ItemArray);
             }
+        }
+
+        public void GetColumnIndecies(out Dictionary<string, int> columnIndecies)
+        {
+            columnIndecies = new();
+            foreach (DataColumn col in m_dataTable.Columns)
+                columnIndecies.Add(col.ColumnName, col.Ordinal);
         }
 
         public void Dispose()

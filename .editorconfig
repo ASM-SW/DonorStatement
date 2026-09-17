@@ -1,7 +1,72 @@
-﻿[*.cs]
+﻿# Topmost indicates this is the root configuration file for this repository
+root = true
 
-# IDE0055: Fix formatting
-#dotnet_diagnostic.IDE0055.severity = none
-dotnet_diagnostic.CA1031.severity = none # exception handling rule
-dotnet_diagnostic.CA1303.severity = none # literal string should be in resource file
-dotnet_diagnostic.CA1805.severity = none # setting default value to variable
+# All C# source code files
+[*.cs]
+
+dotnet_diagnostic.CA1416.severity = none # is only supported on Windows
+
+# ==========================================
+# 1. BUG PREVENTION & RELIABILITY ELEVATIONS
+# ==========================================
+
+# CA1508: Avoid dead conditional code (Catches copy-paste logic flaws)
+dotnet_diagnostic.CA1508.severity = warning
+
+# CA2208: Instantiate argument exceptions correctly (Fixes swapped param/message names)
+dotnet_diagnostic.CA2208.severity = warning
+
+# CA2211: Non-constant fields should not be visible (Prevents dangerous multi-thread race conditions)
+dotnet_diagnostic.CA2211.severity = warning
+
+# CA2254: Template should be a static expression (Ensures efficient, high-perf structured logging logs)
+dotnet_diagnostic.CA2254.severity = warning
+
+
+# ==========================================
+# 2. ASYNC & THREADING ELEVATIONS
+# ==========================================
+
+# CA2016: Forward the CancellationToken to async methods (Prevents un-abortable background tasks)
+dotnet_diagnostic.CA2016.severity = warning
+
+# CA2244: Do not duplicate indexed element initializations
+dotnet_diagnostic.CA2244.severity = warning
+
+# CA2007: Consider calling ConfigureAwait on awaited tasks
+# NOTE: Set to 'warning' for UI/Desktop apps or legacy ASP.NET. Set to 'none' for modern .NET Core / Web APIs.
+dotnet_diagnostic.CA2007.severity = none
+
+
+# ==========================================
+# 3. HIGH-IMPACT PERFORMANCE ELEVATIONS
+# ==========================================
+
+# CA1822: Mark members as static (Allows faster direct call opcodes instead of virtual lookups)
+dotnet_diagnostic.CA1822.severity = warning
+
+# CA1827: Do not use Count() if Any() can be used (Stops full collection loops just to check for items)
+dotnet_diagnostic.CA1827.severity = warning
+
+# CA1828: Do not use CountAsync() if AnyAsync() can be used
+dotnet_diagnostic.CA1828.severity = warning
+
+# CA1860: Avoid unnecessary 'Any' extension method calls (Forces Count/Length == 0 check to eliminate allocations)
+dotnet_diagnostic.CA1860.severity = warning
+
+# CA1852: Seal internal types (Enables compiler devirtualization optimizations)
+dotnet_diagnostic.CA1852.severity = warning
+
+# CA1854: Prefer IDictionary.TryGetValue (Eliminates double hash-lookups with ContainsKey + Item indexer)
+dotnet_diagnostic.CA1854.severity = warning
+
+
+# ==========================================
+# 4. CODE CLEANLINESS & MODERNIZATION
+# ==========================================
+
+# CA2249: Consider using 'String.Contains' instead of 'String.IndexOf' (Safer, easier to read, optimized)
+dotnet_diagnostic.CA2249.severity = warning
+
+# IDE0005: Remove unnecessary using directives (Keeps file headers clean)
+dotnet_diagnostic.IDE0005.severity = warning

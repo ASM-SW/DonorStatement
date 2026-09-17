@@ -13,7 +13,7 @@ namespace DonorStatement
 {
     internal delegate void LogMessageDelegate(string msg);
 
-    internal partial class FormMain : Form
+    internal sealed partial class FormMain : Form
     {
         private static Form MainForm { get; set; }
         public static Rectangle Rectangle
@@ -59,6 +59,10 @@ namespace DonorStatement
             m_parser = new FileParser(m_loggerDelegate);
             MainForm = this;
             ColumnMap.SetLogger(m_loggerDelegate);
+
+            // Enable QuestPDF debugging for more detailed exceptions
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+            QuestPDF.Settings.EnableDebugging = true;
 
             InitializeComponent();
             InitializeControls();

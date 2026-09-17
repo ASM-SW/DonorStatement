@@ -5,18 +5,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace DonorStatement
 {
-    internal partial class FormCreateDocs : Form
+    internal sealed partial class FormCreateDocs : Form
     {
         readonly FileParser m_parser;
         readonly DocumentCreator m_docCreator;
         readonly LogMessageDelegate m_logger;
-        bool m_CancelPending = false;  // Set to true to cancel the background thread, bools are atomic per spec
-        Thread m_backgroundThread = null;
+        bool m_CancelPending;  // Set to true to cancel the background thread, bools are atomic per spec
+        Thread m_backgroundThread;
 
         public FormCreateDocs(ref FileParser parser, ref DocumentCreator docCreator, ref LogMessageDelegate logger)
         {
@@ -45,26 +46,23 @@ namespace DonorStatement
         private void BackgroundWork()
         {
             m_logger(string.Format(CultureInfo.CurrentCulture, "Start: {0}", DateTimeOffset.Now.ToString("HH:mm:ss", CultureInfo.CurrentCulture)));
-            if(!m_docCreator.DocumentCreatorInit())
-            {
-                m_docCreator.CreateDocsDone();
-                EnableButtons();
-                return;
-            }
-
-            if(!m_parser.FileHasBeenRead)
+            if (!m_parser.FileHasBeenRead)
                 m_parser.ParseInputFile();
 
-            m_parser.GetColumnNames(out List<string> columnNames);
-            if (!ColumnMap.CheckForColumns(ref columnNames))
+            // perform a set of rule checks and initializations.            
+            m_parser.GetColumnIndecies(out Dictionary<string, int> columnIndecies);
+            bool isOk = ColumnMap.CheckForColumns(columnIndecies.Keys.ToList());
+            isOk &= m_docCreator.GetDataTableInfo(columnIndecies);
+            isOk &= m_docCreator.DocumentCreatorInit();
+            if(!isOk)
             {
                 m_docCreator.CreateDocsDone();
                 EnableButtons();
                 return;
             }
 
+            // Get a list of customer names, and create the letter for each one.
             m_parser.GetNameList(out List<string> names);
-
             for (int i = 0; i < names.Count; i++)
             {
                 if (m_CancelPending)

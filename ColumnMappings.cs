@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.IO.Pipes;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -66,7 +65,7 @@ namespace DonorStatement
                 m_Mappings[mapping.Key] = mapping.Value;
         }
 
-        public static bool CheckForColumns(ref List<string> columnNames)
+        public static bool CheckForColumns(List<string> columnNames)
         {
             LoadColumnMappings();
             StringBuilder msg = new("CSV input file is missing the following columns: ");
@@ -93,7 +92,7 @@ namespace DonorStatement
 
 
     [Serializable]
-    internal class ColumnMappings
+    public sealed class ColumnMappings
     {
         [XmlArray("Mappings")]
         [XmlArrayItem("Mapping")]
@@ -142,7 +141,7 @@ namespace DonorStatement
     }
 
     [Serializable]
-    internal class Mapping
+    public sealed class Mapping
     {
         public string Key { get; set; }
         public string Value { get; set; }

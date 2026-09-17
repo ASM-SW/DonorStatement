@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace DonorStatement
 {
-    internal partial class FormFileParser : Form
+    internal sealed partial class FormFileParser : Form
     {
         readonly FileParser m_parser;
         public FormFileParser(ref FileParser parser)
