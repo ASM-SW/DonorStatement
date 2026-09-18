@@ -15,7 +15,8 @@ namespace DonorStatement
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMain());
+            using var mainForm = new FormMain();
+            Application.Run(mainForm);
         }
     }
 }

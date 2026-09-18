@@ -1,72 +1,176 @@
 ﻿# Topmost indicates this is the root configuration file for this repository
 root = true
 
-# All C# source code files
+
+# ============================================================
+# C# SOURCE FILES
+# ============================================================
+
 [*.cs]
 
-dotnet_diagnostic.CA1416.severity = none # is only supported on Windows
 
-# ==========================================
-# 1. BUG PREVENTION & RELIABILITY ELEVATIONS
-# ==========================================
+# ============================================================
+# PLATFORM COMPATIBILITY
+# ============================================================
 
-# CA1508: Avoid dead conditional code (Catches copy-paste logic flaws)
+# CA1416: Validate platform compatibility
+# Disabled because this application/library is intentionally Windows-specific.
+dotnet_diagnostic.CA1416.severity = none
+
+
+# ============================================================
+# BUG PREVENTION & RELIABILITY
+# ============================================================
+
+# CA1508: Avoid dead conditional code
+# Detects conditions that are always true/false and can reveal logic errors.
 dotnet_diagnostic.CA1508.severity = warning
 
-# CA2208: Instantiate argument exceptions correctly (Fixes swapped param/message names)
+# CA2208: Instantiate argument exceptions correctly
+# Ensures ArgumentException constructors receive the correct parameter name/message.
 dotnet_diagnostic.CA2208.severity = warning
 
-# CA2211: Non-constant fields should not be visible (Prevents dangerous multi-thread race conditions)
+# CA2211: Non-constant fields should not be visible
+# Detects visible non-constant static fields that can cause unsafe shared state.
 dotnet_diagnostic.CA2211.severity = warning
 
-# CA2254: Template should be a static expression (Ensures efficient, high-perf structured logging logs)
+# CA2254: Template should be a static expression
+# Ensures logging message templates are constant/static for structured logging.
 dotnet_diagnostic.CA2254.severity = warning
 
 
-# ==========================================
-# 2. ASYNC & THREADING ELEVATIONS
-# ==========================================
+# ============================================================
+# ASYNC & THREADING
+# ============================================================
 
-# CA2016: Forward the CancellationToken to async methods (Prevents un-abortable background tasks)
+# CA2012: Use ValueTasks correctly
+# Prevents incorrect handling of ValueTask instances.
+dotnet_diagnostic.CA2012.severity = warning
+
+# CA2014: Do not use stackalloc in loops
+# Prevents excessive stack growth/overflow from repeated stack allocations.
+dotnet_diagnostic.CA2014.severity = warning
+
+# CA2016: Forward the CancellationToken to methods that take one
+# Ensures cancellation requests propagate through asynchronous call chains.
 dotnet_diagnostic.CA2016.severity = warning
 
+# CA2022: Avoid inexact read with Stream.Read
+# Detects code that assumes Stream.Read fills the requested buffer completely.
+dotnet_diagnostic.CA2022.severity = warning
+
 # CA2244: Do not duplicate indexed element initializations
+# Detects duplicate initialization of the same indexed element.
 dotnet_diagnostic.CA2244.severity = warning
 
-# CA2007: Consider calling ConfigureAwait on awaited tasks
-# NOTE: Set to 'warning' for UI/Desktop apps or legacy ASP.NET. Set to 'none' for modern .NET Core / Web APIs.
+# CA2007: Do not directly await a Task without ConfigureAwait
+# Disabled globally because desktop UI code often intentionally resumes on
+# the UI synchronization context.
 dotnet_diagnostic.CA2007.severity = none
 
 
-# ==========================================
-# 3. HIGH-IMPACT PERFORMANCE ELEVATIONS
-# ==========================================
+# ============================================================
+# RESOURCE & DISPOSAL SAFETY
+# ============================================================
 
-# CA1822: Mark members as static (Allows faster direct call opcodes instead of virtual lookups)
+# CA2000: Dispose objects before losing scope
+# Detects IDisposable objects that may not be disposed.
+dotnet_diagnostic.CA2000.severity = warning
+
+# CA2213: Disposable fields should be disposed
+# Ensures classes dispose IDisposable fields that they own.
+dotnet_diagnostic.CA2213.severity = warning
+
+# CA2215: Dispose methods should call base class dispose
+# Ensures derived IDisposable implementations correctly call base disposal.
+dotnet_diagnostic.CA2215.severity = warning
+
+
+# ============================================================
+# PERFORMANCE
+# ============================================================
+
+# CA1822: Mark members as static
+# Identifies instance members that do not access instance state.
 dotnet_diagnostic.CA1822.severity = warning
 
-# CA1827: Do not use Count() if Any() can be used (Stops full collection loops just to check for items)
+# CA1827: Do not use Count/LongCount when Any can be used
+# Avoids enumerating an entire sequence when only existence needs to be checked.
 dotnet_diagnostic.CA1827.severity = warning
 
-# CA1828: Do not use CountAsync() if AnyAsync() can be used
+# CA1828: Do not use CountAsync/LongCountAsync when AnyAsync can be used
+# Avoids unnecessary asynchronous counting when only existence needs to be checked.
 dotnet_diagnostic.CA1828.severity = warning
 
-# CA1860: Avoid unnecessary 'Any' extension method calls (Forces Count/Length == 0 check to eliminate allocations)
-dotnet_diagnostic.CA1860.severity = warning
+# CA1851: Possible multiple enumerations of IEnumerable
+# Detects potentially expensive repeated enumeration of the same sequence.
+dotnet_diagnostic.CA1851.severity = warning
 
-# CA1852: Seal internal types (Enables compiler devirtualization optimizations)
+# CA1852: Seal internal types
+# Allows the runtime/JIT to make stronger optimization assumptions about internal types.
 dotnet_diagnostic.CA1852.severity = warning
 
-# CA1854: Prefer IDictionary.TryGetValue (Eliminates double hash-lookups with ContainsKey + Item indexer)
+# CA1854: Prefer IDictionary.TryGetValue
+# Avoids performing separate ContainsKey and indexer lookups.
 dotnet_diagnostic.CA1854.severity = warning
 
+# CA1860: Avoid unnecessary Any() calls
+# Prefers Count/Length when the collection already exposes those properties.
+# Kept as suggestion because this is more situational than CA1827/CA1828.
+dotnet_diagnostic.CA1860.severity = suggestion
 
-# ==========================================
-# 4. CODE CLEANLINESS & MODERNIZATION
-# ==========================================
 
-# CA2249: Consider using 'String.Contains' instead of 'String.IndexOf' (Safer, easier to read, optimized)
-dotnet_diagnostic.CA2249.severity = warning
+# ============================================================
+# LOGGING
+# ============================================================
 
-# IDE0005: Remove unnecessary using directives (Keeps file headers clean)
+# CA1848: Use the LoggerMessage delegates for improved performance
+# Encourages source-generated/high-performance logging for frequently executed code.
+dotnet_diagnostic.CA1848.severity = suggestion
+
+
+# ============================================================
+# EXCEPTION HANDLING
+# ============================================================
+
+# CA2200: Rethrow to preserve stack details
+# Prevents "throw ex;" from destroying the original exception stack trace.
+dotnet_diagnostic.CA2200.severity = warning
+
+
+# ============================================================
+# ARGUMENT VALIDATION
+# ============================================================
+
+# CA1510: Use ArgumentNullException.ThrowIfNull
+# Encourages the modern ThrowIfNull API for null argument validation.
+dotnet_diagnostic.CA1510.severity = warning
+
+# CA1511: Use ArgumentException.ThrowIfNullOrEmpty
+# Encourages the modern helper for null/empty string validation.
+dotnet_diagnostic.CA1511.severity = warning
+
+# CA1512: Use ArgumentOutOfRangeException.ThrowIf...
+# Encourages modern ThrowIf... APIs for argument range validation.
+dotnet_diagnostic.CA1512.severity = warning
+
+# CA1068: CancellationToken parameters must come last
+# Keeps public APIs consistent and makes optional cancellation tokens easier to use.
+dotnet_diagnostic.CA1068.severity = warning
+
+
+# ============================================================
+# CODE CLEANLINESS & MAINTAINABILITY
+# ============================================================
+
+# IDE0005: Remove unnecessary using directives
+# Removes imports that are not required by the source file.
 dotnet_diagnostic.IDE0005.severity = warning
+
+# IDE0060: Remove unused parameter
+# Detects parameters that are not used by a method.
+dotnet_diagnostic.IDE0060.severity = warning
+
+# IDE0079: Remove unnecessary suppression
+# Detects pragma/suppression attributes that no longer suppress anything.
+dotnet_diagnostic.IDE0079.severity = warning

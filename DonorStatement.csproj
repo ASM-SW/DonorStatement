@@ -52,10 +52,11 @@
     <Content Include="notes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ASM-SW.PdfCreator" Version="1.0.1" />
+    <!--<PackageReference Include="ASM-SW.PdfCreator" Version="1.0.1" />-->
     <PackageReference Include="QuestPDF" Version="2026.8.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\NugetLibs\PdfCreator\ASM-SW.PdfCreator.csproj" />
     <ProjectReference Include="..\MessageBoxCenteredDll\MessageBoxCenteredDll.csproj" />
   </ItemGroup>
   <ItemGroup>

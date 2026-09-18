@@ -69,6 +69,7 @@ namespace DonorStatement
             "«Billing_street»",
             "«Billing_zip_code»",
             "«Full_name»",
+            "«Total_Donations»",
             "«YearDateRange»",
         ];
 
@@ -155,6 +156,7 @@ namespace DonorStatement
             }
             try
             {
+                m_logger($"Reading template file: {FormMain.Config.PdfTemplateFile}");
                 templateText = File.ReadAllText(FormMain.Config.PdfTemplateFile);
                 m_template = JsonSerializer.Deserialize<LetterTemplate>(templateText);
                 if (m_template == null)
@@ -368,6 +370,7 @@ namespace DonorStatement
                 m_logger("Skipping: " + customerName + ", No items were found, or item amount was zero.");
                 return;
             }
+            fields.Add("Total_Donations", m_DonationTable.Total.ToString(m_DonationTable.Total < 10 ? formatNumberSmall : formatNumberLarge, CultureInfo.InvariantCulture));
 
             // add summary row to the end of each table
             foreach (TableInfo tableInTemplate in new TableInfo[] { m_DonationTable, m_OtherPaymentsTable })
