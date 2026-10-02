@@ -1,4 +1,4 @@
-﻿// Copyright © 2016-2024 ASM-SW
+﻿// Copyright © 2016-2026 ASM-SW
 //asm-sw@outlook.com  https://github.com/asm-sw
 using MessageBoxCenteredDll;
 using System;
@@ -72,8 +72,8 @@ namespace DonorStatement
         {
             // Add forms in the order to be displayed
             m_forms.Add(new FormConfiguration());
-            m_forms.Add(new FormFileParser(ref m_parser));
-            m_forms.Add(new FormItemIgnore());
+            m_forms.Add(new FormFileParser(m_parser, m_loggerDelegate));
+            //m_forms.Add(new FormItemIgnore());
             m_forms.Add(new FormCreateDocs(ref m_parser, ref m_docCreator, ref m_loggerDelegate));
 
             // initial configuration for each form

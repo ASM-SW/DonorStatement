@@ -30,9 +30,9 @@ namespace DonorStatement
         // set ItemListIgnore to contain items selected
         private void SaveSelected()
         {
-            FormMain.Config.ItemListIgnore.Clear();
+            FormMain.Config.ListIgnore.Clear();
             foreach (string item in listItems.SelectedItems)
-                FormMain.Config.ItemListIgnore.Add(item);
+                FormMain.Config.ListIgnore.Add(item);
         }
 
         // update listbox so that it contains items not selected in previous form and select items from the ItemListIgnore collection
@@ -40,11 +40,11 @@ namespace DonorStatement
         {
             listItems.Items.Clear();
 
-            FormMain.Config.ItemListIgnore.Sort();
-            foreach (string item in FormMain.Config.ItemListNotSelected)
+            FormMain.Config.ListIgnore.Sort();
+            foreach (string item in FormMain.Config.ListOther)
             {
                 listItems.Items.Add(item);
-                if (FormMain.Config.ItemListIgnore.BinarySearch(item) >= 0)
+                if (FormMain.Config.ListIgnore.BinarySearch(item) >= 0)
                     listItems.SelectedItems.Add(item);
             }
         }

@@ -1,126 +1,179 @@
-﻿// Copyright © 2016-2024 ASM-SW
-//asm-sw@outlook.com  https://github.com/asm-sw
+// Copyright © 2016-2026 ASM-SW
+// asm-sw@outlook.com  https://github.com/asm-sw
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace DonorStatement
 {
-    internal sealed partial class FormFileParser : Form
+    internal sealed partial class FormFileParser : Form, ISubForm
     {
         readonly FileParser m_parser;
-        public FormFileParser(ref FileParser parser)
+        readonly LogMessageDelegate m_logger;
+
+        public FormFileParser(FileParser parser, LogMessageDelegate logger)
         {
             m_parser = parser;
+            m_logger = logger;
             InitializeComponent();
 
-            // for each item coming in from file parser, load it into the control and select it.
-            foreach (string item in FormMain.Config.ItemListSelected)
-                listItems.Items.Add(item);
-            for (int i = 0; i < listItems.Items.Count; i++)
-                listItems.SetSelected(i, true);
-
+            ReloadAllLists();
             SetTextFileHasBeenRead();
+        }
+
+        public bool CanExit(out string errorMsg)
+        {
+            errorMsg = string.Empty;
+            if (!m_parser.FileHasBeenRead)
+            {
+                errorMsg = "Please parse the input file before proceeding to the next step.";
+                return false;
+            }
+            return true;
         }
 
         private void SetTextFileHasBeenRead()
         {
-            if (m_parser.FileHasBeenRead)
-                textFileHasBeenRead.Text = "Input File has been read in";
-            else
-                textFileHasBeenRead.Text = "Input File has not been read.  Click on Parse to read it and update the list of items.";
+            textFileHasBeenRead.Text = m_parser.FileHasBeenRead
+                ? "Input File has been read in."
+                : "Input File has not been read. Click on Parse to read it and update the list of items.";
         }
 
+        /// <summary>
+        /// Parses the input file.  If an item in one of the list boxes isn't in the 
+        /// input file it will be removed from the list. New items will be added 
+        /// to the list in the Donations list box.
+        /// </summary>
         private void ButtonParse_Click(object sender, EventArgs e)
         {
-            m_parser.ParseInputFile();
-            m_parser.GetItemList(out List<string> itemListFromFile);
-            itemListFromFile.Sort();
-
-            // replace item list in configuration with new one.
-            // also populate control
-            listItems.Items.Clear();
-            foreach (string item in itemListFromFile)
+            Cursor = Cursors.WaitCursor;
+            try
             {
-                // if item was in old list put in new list with same selection value.
-                if (FormMain.Config.ItemListSelected.BinarySearch(item) >= 0)
+                if (!m_parser.ParseInputFile())
+                    return;
+
+                m_parser.GetItemList(out List<string> itemListFromFile);
+                HashSet<string> fileItemSet = new(itemListFromFile, StringComparer.CurrentCultureIgnoreCase);
+
+                // Prune items no longer present in input file
+                PruneRemovedItems(FormMain.Config.ListDonations, fileItemSet, "Donations");
+                PruneRemovedItems(FormMain.Config.ListOther, fileItemSet, "Other");
+                PruneRemovedItems(FormMain.Config.ListIgnore, fileItemSet, "Ignore");
+
+                // Add new items into ListDonations by default
+                HashSet<string> otherSet = new(FormMain.Config.ListOther, StringComparer.CurrentCultureIgnoreCase);
+                HashSet<string> ignoreSet = new(FormMain.Config.ListIgnore, StringComparer.CurrentCultureIgnoreCase);
+                HashSet<string> donationSet = new(FormMain.Config.ListDonations, StringComparer.CurrentCultureIgnoreCase);
+
+                foreach (string item in itemListFromFile)
                 {
-                    listItems.Items.Add(item);
-                    listItems.SelectedItems.Add(item);
+                    if (otherSet.Contains(item) || ignoreSet.Contains(item) || donationSet.Contains(item))
+                        continue;
+
+                    FormMain.Config.ListDonations.Add(item);
+                    donationSet.Add(item);
                 }
-                else
-                    listItems.Items.Add(item);
 
+                // Crucial: Must re-sort for DocumentCreator's BinarySearch
+                FormMain.Config.ListDonations.Sort();
+                FormMain.Config.ListOther.Sort();
+                FormMain.Config.ListIgnore.Sort();
+
+                ReloadAllLists();
+
+                if (listDonations.Items.Count > 0)
+                    listDonations.TopIndex = 0;
+
+                SetTextFileHasBeenRead();
             }
-
-            // remove any items from ItemListNotSelected that is not in itemListFromFile
-            List<int> indexItemsToRemove = [];
-            for (int i = 0; i < FormMain.Config.ItemListNotSelected.Count; i++)
+            finally
             {
-                if (itemListFromFile.BinarySearch(FormMain.Config.ItemListNotSelected[i]) < 0)
-                    indexItemsToRemove.Insert(0, i);
+                Cursor = Cursors.Default;
             }
-            // The iteration and remove is working because theindexItemsToRemove is automatically reverse sorted by inserting at the beginning, see above
-            foreach (int item in indexItemsToRemove)
-                FormMain.Config.ItemListNotSelected.RemoveAt(item);
-
-            UpdateConfigurationWithSelectedItems();
-
-            // scroll to top
-            if (listItems.Items.Count > 0)
-                listItems.TopIndex = 0;
-            SetTextFileHasBeenRead();
         }
 
+        /// <summary>
+        /// Remove items from a list that are not present in the input file.
+        /// </summary>
+        /// <param name="list">The list to remove items from.</param>
+        /// <param name="validItems">A hash set of items to keep.</param>
+        /// <param name="listName">The name of the list to use in the log message.</param>
+        private void PruneRemovedItems(List<string> list, HashSet<string> validItems, string listName)
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                string item = list[i];
+                if (!validItems.Contains(item))
+                {
+                    list.RemoveAt(i);
+                    m_logger($"Item '{item}' was removed from {listName} because it is no longer in the input file.");
+                }
+            }
+        }
 
         private void FileParserForm_VisibleChanged(object sender, EventArgs e)
         {
-            if (((System.Windows.Forms.Control)sender).Visible)
-                return;  // became visible, do nothing
-
-            UpdateConfigurationWithSelectedItems();
-        }
-
-        private void UpdateConfigurationWithSelectedItems()
-        {
-            FormMain.Config.ItemListSelected.Clear();
-            for (int i = 0; i < listItems.Items.Count; i++)
+            if (Visible)
             {
-                if (listItems.GetSelected(i))
-                    FormMain.Config.ItemListSelected.Add(listItems.GetItemText(listItems.Items[i]));
-                else
-                {
-                    if (!FormMain.Config.ItemListNotSelected.Contains(listItems.Items[i].ToString()))
-                        FormMain.Config.ItemListNotSelected.Add(listItems.GetItemText(listItems.Items[i]));
-                }
+                SetTextFileHasBeenRead();
             }
-            FormMain.Config.ItemListSelected.Sort();
-            FormMain.Config.ItemListNotSelected.Sort();
         }
 
-        private void CheckUnCheckAll(bool bSelect)
+        private void butSelectToNotSelect_Click(object sender, EventArgs e) =>
+            MoveSelectedItems(listDonations, FormMain.Config.ListDonations, FormMain.Config.ListOther, LoadDonations, LoadOther);
+
+        private void buttonNotSelectedToSelected_Click(object sender, EventArgs e) =>
+            MoveSelectedItems(listNotDonations, FormMain.Config.ListOther, FormMain.Config.ListDonations, LoadOther, LoadDonations);
+
+        private void buttonNotSelectedToIgnore_Click(object sender, EventArgs e) =>
+            MoveSelectedItems(listNotDonations, FormMain.Config.ListOther, FormMain.Config.ListIgnore, LoadOther, LoadIgnore);
+
+        private void buttonIgnoreToNotSelected_Click(object sender, EventArgs e) =>
+            MoveSelectedItems(listIgnore, FormMain.Config.ListIgnore, FormMain.Config.ListOther, LoadIgnore, LoadOther);
+
+        private static void MoveSelectedItems(ListBox sourceBox, List<string> sourceList, List<string> targetList, Action reloadSource, Action reloadTarget)
         {
-            listItems.Visible = false;
-            if (bSelect)
+            if (sourceBox.SelectedItems.Count == 0)
+                return;
+
+            foreach (var item in sourceBox.SelectedItems)
             {
-                for (int i = 0; i < listItems.Items.Count; i++)
-                    listItems.SetSelected(i, true);
+                string text = sourceBox.GetItemText(item);
+                if (!targetList.Contains(text))
+                    targetList.Add(text);
+                sourceList.Remove(text);
             }
-            else
-                listItems.SelectedItems.Clear();
-            listItems.Visible = true;
+
+            sourceList.Sort();
+            targetList.Sort();
+
+            reloadSource();
+            reloadTarget();
         }
 
-        private void ButtonSelectAll_Click(object sender, EventArgs e)
+        private void ReloadAllLists()
         {
-            CheckUnCheckAll(true);
+            LoadDonations();
+            LoadOther();
+            LoadIgnore();
         }
 
-        private void ButtonClearSelections_Click(object sender, EventArgs e)
+        private void LoadDonations() => PopulateListBox(listDonations, FormMain.Config.ListDonations);
+        private void LoadOther() => PopulateListBox(listNotDonations, FormMain.Config.ListOther);
+        private void LoadIgnore() => PopulateListBox(listIgnore, FormMain.Config.ListIgnore);
+
+        private static void PopulateListBox(ListBox listBox, List<string> items)
         {
-            CheckUnCheckAll(false);
+            listBox.BeginUpdate();
+            try
+            {
+                listBox.Items.Clear();
+                listBox.Items.AddRange(items.ToArray());
+            }
+            finally
+            {
+                listBox.EndUpdate();
+            }
         }
-
-
     }
 }

@@ -1,4 +1,4 @@
-// Copyright © 2016-2025 ASM-SW
+// Copyright © 2016-2026 ASM-SW
 //asm-sw@outlook.com  https://github.com/asm-sw
 using ASM_SW.PdfCreator;
 using MessageBoxCenteredDll;
@@ -212,19 +212,19 @@ namespace DonorStatement
         }
 
         // Get the column numbers for the columns in the data table that are required to be present.
-        public bool GetDataTableInfo(Dictionary<string, int> columnIndecies)
+        public bool GetDataTableInfo(Dictionary<string, int> columnIndices)
         {
             bool isOk = true;
-            m_idxAmount = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Amount"), -1);
-            m_idxBilling_city = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Billing city"), -1);
-            m_idxBilling_state = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Billing state"), -1);
-            m_idxBilling_street = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Billing street"), -1);
-            m_idxBilling_zip_code = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Billing zip code"), -1);
-            m_idxCustomer = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Customer"), -1);
-            m_idxDate = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Date"), -1);
-            m_idxDescription = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Description"), -1);
-            m_idxEmail = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Email"), -1);
-            m_idxProduct_Service = columnIndecies.GetValueOrDefault(ColumnMap.Lookup("Product/Service"), -1);
+            m_idxAmount = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Amount"), -1);
+            m_idxBilling_city = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Billing city"), -1);
+            m_idxBilling_state = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Billing state"), -1);
+            m_idxBilling_street = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Billing street"), -1);
+            m_idxBilling_zip_code = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Billing zip code"), -1);
+            m_idxCustomer = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Customer"), -1);
+            m_idxDate = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Date"), -1);
+            m_idxDescription = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Description"), -1);
+            m_idxEmail = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Email"), -1);
+            m_idxProduct_Service = columnIndices.GetValueOrDefault(ColumnMap.Lookup("Product/Service"), -1);
 
             StringBuilder msg = new("Columns missing from input data: ");
             if (m_idxAmount == -1) { isOk = false; msg.Append("Amount, "); }
@@ -337,10 +337,10 @@ namespace DonorStatement
 
                 // Binary search returns  0 based index of find, negative number if not found
                 //check to see if the item should be ignored, if so drop it
-                if (FormMain.Config.ItemListIgnore.BinarySearch(item) >= 0)
+                if (FormMain.Config.ListIgnore.BinarySearch(item) >= 0)
                     continue;
                 bool isDonation = false;
-                if (FormMain.Config.ItemListSelected.BinarySearch(item) >= 0)
+                if (FormMain.Config.ListDonations.BinarySearch(item) >= 0)
                     isDonation = true;
                 RemoveDeletedFromString(ref item);
 

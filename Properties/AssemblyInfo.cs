@@ -10,7 +10,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ASM-SW")]
 [assembly: AssemblyProduct("DonorStatement for Quickbooks Online")]
-[assembly: AssemblyCopyright("Copyright © 2016-2025")]
+[assembly: AssemblyCopyright("Copyright © 2016-2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en-US")]

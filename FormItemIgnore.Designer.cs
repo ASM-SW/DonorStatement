@@ -41,7 +41,7 @@ namespace DonorStatement
             this.listItems.FormattingEnabled = true;
             this.listItems.Location = new System.Drawing.Point(35, 41);
             this.listItems.Margin = new System.Windows.Forms.Padding(2);
-            this.listItems.Name = "listItems";
+            this.listItems.Name = "listDonations";
             this.listItems.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.listItems.Size = new System.Drawing.Size(601, 199);
             this.listItems.TabIndex = 1;
